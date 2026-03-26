@@ -1,0 +1,190 @@
+<!-- Fondo oscuro con blur -->
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn" (click)="cerrar()">
+  
+  <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto animate-scaleIn" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="sticky top-0 bg-gradient-to-r from-green-600 to-teal-600 text-white p-5 rounded-t-2xl">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <span class="text-2xl">👶</span>
+          <h2 class="text-xl font-bold">{{ editando ? 'Editar Paciente' : 'Nuevo Paciente' }}</h2>
+        </div>
+        <button (click)="cerrar()" class="hover:bg-white/20 rounded-lg p-2 transition">✕</button>
+      </div>
+      <p class="text-sm text-white/80 mt-1">Complete los datos del paciente y su tutor</p>
+    </div>
+
+    <!-- Body del modal con tabs -->
+    <div class="p-6">
+      <!-- Tabs -->
+      <div class="flex border-b mb-6">
+        <button (click)="tabActivo = 'paciente'" 
+          class="py-2 px-4 font-semibold transition"
+          [class.text-green-600]="tabActivo === 'paciente'"
+          [class.border-b-2]="tabActivo === 'paciente'"
+          [class.border-green-600]="tabActivo === 'paciente'"
+          [class.text-gray-500]="tabActivo !== 'paciente'">
+          👤 Datos del Paciente
+        </button>
+        <button (click)="tabActivo = 'tutor'" 
+          class="py-2 px-4 font-semibold transition"
+          [class.text-green-600]="tabActivo === 'tutor'"
+          [class.border-b-2]="tabActivo === 'tutor'"
+          [class.border-green-600]="tabActivo === 'tutor'"
+          [class.text-gray-500]="tabActivo !== 'tutor'">
+          👨‍👩 Datos del Tutor
+        </button>
+      </div>
+
+      <form #pacienteForm="ngForm" class="space-y-5">
+        <!-- TAB PACIENTE -->
+        @if (tabActivo === 'paciente') {
+          <div class="space-y-4 animate-fadeIn">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Nombre *</label>
+                <input [(ngModel)]="paciente.nombre" name="paciente_nombre" required #nombreP="ngModel" type="text"
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 transition"
+                  [class.border-green-500]="nombreP.valid && nombreP.touched"
+                  [class.border-red-500]="nombreP.invalid && nombreP.touched">
+                @if (nombreP.invalid && nombreP.touched) {
+                  <p class="text-red-500 text-xs mt-1">Campo requerido</p>
+                }
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Apellido Paterno *</label>
+                <input [(ngModel)]="paciente.apellido_paterno" name="paciente_apellido_paterno" required #apPaternoP="ngModel" type="text"
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 transition">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Apellido Materno *</label>
+                <input [(ngModel)]="paciente.apellido_materno" name="paciente_apellido_materno" required #apMaternoP="ngModel" type="text"
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 transition">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">CI / Cédula *</label>
+                <input [(ngModel)]="paciente.ci" name="paciente_ci" required #ciP="ngModel" type="text" (input)="validarCIPaciente()"
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 transition"
+                  [class.border-green-500]="ciPacienteValid && ciP.touched"
+                  [class.border-red-500]="ciPacienteInvalid && ciP.touched">
+                @if (ciPacienteInvalid && ciP.touched) {
+                  <p class="text-red-500 text-xs mt-1">Solo números, mínimo 7 dígitos</p>
+                }
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Fecha de Nacimiento *</label>
+                <input [(ngModel)]="paciente.fecha_nacimiento" name="paciente_fecha_nacimiento" required type="date" (input)="validarFechaNacimientoPaciente()"
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 transition"
+                  [class.border-green-500]="fechaPacienteValid && paciente.fecha_nacimiento"
+                  [class.border-red-500]="fechaPacienteInvalid && paciente.fecha_nacimiento">
+                @if (fechaPacienteInvalid && paciente.fecha_nacimiento) {
+                  <p class="text-red-500 text-xs mt-1">La fecha no puede ser futura</p>
+                }
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Género *</label>
+                <select [(ngModel)]="paciente.genero" name="paciente_genero" required
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 transition">
+                  <option value="">Seleccionar</option>
+                  <option value="masculino">Masculino</option>
+                  <option value="femenino">Femenino</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- TAB TUTOR -->
+        @if (tabActivo === 'tutor') {
+          <div class="space-y-4 animate-fadeIn">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Nombre *</label>
+                <input [(ngModel)]="tutor.nombre" name="tutor_nombre" required #nombreT="ngModel" type="text"
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 transition"
+                  [class.border-green-500]="nombreT.valid && nombreT.touched"
+                  [class.border-red-500]="nombreT.invalid && nombreT.touched">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Apellido Paterno *</label>
+                <input [(ngModel)]="tutor.apellido_paterno" name="tutor_apellido_paterno" required #apPaternoT="ngModel" type="text"
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 transition">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Apellido Materno</label>
+                <input [(ngModel)]="tutor.apellido_materno" name="tutor_apellido_materno" type="text"
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 transition">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">CI / Cédula *</label>
+                <input [(ngModel)]="tutor.ci" name="tutor_ci" required #ciT="ngModel" type="text" (input)="validarCITutor()"
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 transition"
+                  [class.border-green-500]="ciTutorValid && ciT.touched"
+                  [class.border-red-500]="ciTutorInvalid && ciT.touched">
+                @if (ciTutorInvalid && ciT.touched) {
+                  <p class="text-red-500 text-xs mt-1">Solo números, mínimo 7 dígitos</p>
+                }
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Parentesco *</label>
+                <select [(ngModel)]="tutor.parentesco" name="tutor_parentesco" required
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 transition">
+                  <option value="">Seleccionar</option>
+                  <option value="Padre">Padre</option>
+                  <option value="Madre">Madre</option>
+                  <option value="Abuelo">Abuelo</option>
+                  <option value="Abuela">Abuela</option>
+                  <option value="Tío">Tío</option>
+                  <option value="Tía">Tía</option>
+                  <option value="Hermano">Hermano</option>
+                  <option value="Hermana">Hermana</option>
+                  <option value="Tutor Legal">Tutor Legal</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Teléfono</label>
+                <input [(ngModel)]="tutor.telefono" name="tutor_telefono" type="tel" (input)="validarTelefonoTutor()"
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 transition"
+                  [class.border-green-500]="telefonoTutorValid && tutor.telefono"
+                  [class.border-red-500]="telefonoTutorInvalid && tutor.telefono">
+                @if (telefonoTutorInvalid && tutor.telefono) {
+                  <p class="text-red-500 text-xs mt-1">Solo números, 7-15 dígitos</p>
+                }
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Dirección</label>
+                <input [(ngModel)]="tutor.direccion" name="tutor_direccion" type="text"
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 transition">
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Botones -->
+        <div class="flex justify-end space-x-3 pt-4 border-t mt-4">
+          <button type="button" (click)="cerrar()"
+            class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+            Cancelar
+          </button>
+          <button type="button" (click)="guardar()" [disabled]="!formularioValido() || loading"
+            class="px-6 py-2 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-lg hover:scale-105 transition disabled:opacity-50">
+            {{ loading ? 'Guardando...' : (editando ? 'Actualizar' : 'Guardar Paciente') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

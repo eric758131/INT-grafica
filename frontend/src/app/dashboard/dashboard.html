@@ -1,0 +1,25 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200">
+  <!-- Sidebar fijo -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Contenido principal con margen izquierdo para la sidebar fija -->
+  <div class="ml-64 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-40">
+      <h2 class="text-2xl font-bold text-gray-800">
+        {{ pageTitle }}
+      </h2>
+      <div class="flex items-center space-x-4">
+        <span class="text-gray-600">Bienvenido, {{ nombreUsuario }}</span>
+        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+          {{ iniciales }}
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido dinámico -->
+    <main class="p-6">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

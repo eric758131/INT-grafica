@@ -1,0 +1,141 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+  
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-800">🛏️ Gestión de Camas</h1>
+    <p class="text-gray-600 mt-1">Asigna pacientes a camas o libera camas ocupadas</p>
+  </div>
+
+  <!-- Filtros -->
+  <div class="flex flex-wrap gap-4 bg-white p-4 rounded-xl shadow-md mb-6">
+    <div class="flex items-center gap-2">
+      <span class="text-gray-600">📌 Estado:</span>
+      <select [(ngModel)]="filtroEstado" class="px-3 py-2 border rounded-lg">
+        <option value="todos">Todos</option>
+        <option value="disponible">🟢 Disponible</option>
+        <option value="ocupada">🔴 Ocupada</option>
+        <option value="mantenimiento">🟡 Mantenimiento</option>
+        <option value="reservada">🔵 Reservada</option>
+      </select>
+    </div>
+    
+    <div class="flex items-center gap-2">
+      <span class="text-gray-600">📍 Ubicación:</span>
+      <select [(ngModel)]="filtroUbicacion" class="px-3 py-2 border rounded-lg">
+        <option value="">Todas</option>
+        @for (ubi of ubicaciones; track ubi) {
+          <option [value]="ubi">{{ ubi }}</option>
+        }
+      </select>
+    </div>
+    
+    <div class="flex-1"></div>
+    <div class="text-gray-600">Total: {{ camasFiltradas.length }} camas</div>
+  </div>
+
+  @if (loading) {
+    <div class="flex justify-center items-center h-64">
+      <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent"></div>
+    </div>
+  }
+
+  @if (!loading) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      @for (cama of camasFiltradas; track cama.id) {
+        <div class="cama-card rounded-2xl p-5 transition-all duration-300 hover:shadow-2xl"
+          [class.disponible]="cama.estado_cama === 'disponible'"
+          [class.ocupada]="cama.estado_cama === 'ocupada'"
+          [class.mantenimiento]="cama.estado_cama === 'mantenimiento'"
+          [class.reservada]="cama.estado_cama === 'reservada'">
+          
+          <div class="flex justify-between items-start mb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-4xl">{{ getIconoPorEstado(cama.estado_cama) }}</span>
+              <h3 class="text-xl font-bold text-gray-800">Cama #{{ cama.numero }}</h3>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-2 text-gray-600 mb-3">
+            <span>📍</span>
+            <span>{{ cama.ubicacion }}</span>
+          </div>
+          
+          <!-- Mostrar paciente si está ocupada -->
+          @if (cama.estado_cama === 'ocupada' && cama.paciente_info) {
+            <div class="bg-blue-50 rounded-lg p-2 mb-3">
+              <div class="text-sm font-semibold text-blue-800">👤 Paciente:</div>
+              <div class="text-sm text-blue-700">
+                {{ cama.paciente_info.nombre }} {{ cama.paciente_info.apellido_paterno }}
+                <span class="text-xs text-blue-500">(CI: {{ cama.paciente_info.ci }})</span>
+              </div>
+            </div>
+          }
+          
+          <div class="mt-2">
+            <span class="estado-badge px-3 py-1 rounded-full text-sm font-semibold"
+              [class.disponible-badge]="cama.estado_cama === 'disponible'"
+              [class.ocupada-badge]="cama.estado_cama === 'ocupada'"
+              [class.mantenimiento-badge]="cama.estado_cama === 'mantenimiento'"
+              [class.reservada-badge]="cama.estado_cama === 'reservada'">
+              {{ getTextoEstado(cama.estado_cama) }}
+            </span>
+          </div>
+          
+          <div class="mt-4 pt-3 border-t border-gray-200">
+            @if (cama.estado_cama === 'disponible') {
+              <button (click)="abrirModalAsignacion(cama)"
+                class="w-full py-2 rounded-lg font-semibold transition-all disponible-btn">
+                ✅ Asignar Paciente
+              </button>
+            } @else if (cama.estado_cama === 'ocupada') {
+              <button (click)="liberarCama(cama)"
+                class="w-full py-2 rounded-lg font-semibold transition-all bg-orange-500 text-white hover:bg-orange-600">
+                🔓 Liberar Cama
+              </button>
+            } @else {
+              <button disabled
+                class="w-full py-2 rounded-lg font-semibold opacity-60 cursor-not-allowed"
+                [class.mantenimiento-btn]="cama.estado_cama === 'mantenimiento'"
+                [class.reservada-btn]="cama.estado_cama === 'reservada'">
+                {{ cama.estado_cama === 'mantenimiento' ? '🔧 En Mantenimiento' : '⏳ Reservada' }}
+              </button>
+            }
+          </div>
+        </div>
+      } @empty {
+        <div class="col-span-full text-center py-16">
+          <p class="text-gray-500 text-lg">No hay camas que coincidan con los filtros</p>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Modal de selección de pacientes -->
+@if (mostrarModalPacientes && camaParaAsignar) {
+  <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" (click)="mostrarModalPacientes = false">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto" (click)="$event.stopPropagation()">
+      <div class="bg-gradient-to-r from-green-600 to-teal-600 text-white p-5 rounded-t-2xl sticky top-0">
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-bold">👤 Seleccionar Paciente para Cama {{ camaParaAsignar.numero }}</h2>
+          <button (click)="mostrarModalPacientes = false" class="hover:bg-white/20 rounded-lg p-2">✕</button>
+        </div>
+      </div>
+      <div class="p-6">
+        <div class="grid gap-3">
+          @for (paciente of pacientes; track paciente.id) {
+            <button (click)="asignarPaciente(paciente)"
+              class="text-left p-4 border rounded-xl hover:bg-green-50 hover:border-green-500 transition-all flex justify-between items-center">
+              <div>
+                <div class="font-semibold">{{ paciente.nombre }} {{ paciente.apellido_paterno }} {{ paciente.apellido_materno }}</div>
+                <div class="text-sm text-gray-500">CI: {{ paciente.ci }}</div>
+              </div>
+              <span class="text-green-600 text-xl">→</span>
+            </button>
+          } @empty {
+            <p class="text-center text-gray-500">No hay pacientes registrados</p>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

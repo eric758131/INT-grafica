@@ -1,0 +1,116 @@
+/* Animaciones para las partículas */
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-20px) translateX(10px); }
+  50% { transform: translateY(-30px) translateX(-10px); }
+  75% { transform: translateY(-15px) translateX(15px); }
+}
+
+@keyframes blob {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+}
+
+@keyframes gradient {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Partículas */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(45deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+  animation: float 20s infinite;
+}
+
+.particle-1 {
+  width: 100px;
+  height: 100px;
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.particle-2 {
+  width: 150px;
+  height: 150px;
+  top: 20%;
+  right: 15%;
+  animation-delay: -5s;
+}
+
+.particle-3 {
+  width: 80px;
+  height: 80px;
+  bottom: 15%;
+  left: 20%;
+  animation-delay: -3s;
+}
+
+.particle-4 {
+  width: 200px;
+  height: 200px;
+  bottom: 10%;
+  right: 10%;
+  animation-delay: -7s;
+}
+
+.particle-5 {
+  width: 120px;
+  height: 120px;
+  top: 40%;
+  left: 30%;
+  animation-delay: -2s;
+}
+
+.particle-6 {
+  width: 180px;
+  height: 180px;
+  top: 60%;
+  right: 25%;
+  animation-delay: -4s;
+}
+
+/* Animaciones para los círculos */
+.animate-blob {
+  animation: blob 20s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.animate-gradient {
+  animation: gradient 3s infinite;
+}
+
+/* Efecto de brillo en el borde */
+.shadow-glow {
+  box-shadow: 0 0 30px rgba(236, 72, 153, 0.5);
+}
+
+/* Transiciones suaves para todos los elementos */
+* {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+@keyframes pan {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-10%);
+  }
+}
+
+.animate-pan {
+  animation: pan 20s linear infinite;
+}
