@@ -175,3 +175,35 @@ class Paciente(models.Model):
     
     def __str__(self):
         return f"{self.nombre} {self.apellido_paterno} - CI: {self.ci}"
+    
+
+class Cama(models.Model):
+    ESTADO_CAMA_CHOICES = [
+        ('disponible', 'Disponible'),
+        ('ocupada', 'Ocupada'),
+        ('mantenimiento', 'Mantenimiento'),
+        ('reservada', 'Reservada'),
+    ]
+    
+    numero = models.CharField(max_length=20, unique=True)
+    ubicacion = models.CharField(max_length=100)
+    estado_cama = models.CharField(max_length=15, choices=ESTADO_CAMA_CHOICES, default='disponible')
+    estado = models.CharField(max_length=10, choices=[('activo', 'Activo'), ('inactivo', 'Inactivo')], default='activo')
+    
+    # Relación con paciente
+    paciente = models.ForeignKey(
+        'Paciente',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='cama_asignada'
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'camas'
+    
+    def __str__(self):
+        return f"Cama {self.numero} - {self.ubicacion}"

@@ -23,7 +23,7 @@ class TutorViewSet(viewsets.ModelViewSet):
 
 # ViewSet para Pacientes
 class PacienteViewSet(viewsets.ModelViewSet):
-    queryset = Paciente.objects.all()
+    queryset = Paciente.objects.select_related('tutor').all()  # ← Optimiza la consulta
     serializer_class = PacienteSerializer
 
 # Login personalizado
@@ -45,3 +45,10 @@ def login(request):
             'success': False,
             'message': 'Credenciales inválidas'
         }, status=status.HTTP_401_UNAUTHORIZED)
+    
+from .models import Cama
+from .serializers import CamaSerializer
+
+class CamaViewSet(viewsets.ModelViewSet):
+    queryset = Cama.objects.all()
+    serializer_class = CamaSerializer
