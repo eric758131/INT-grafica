@@ -147,43 +147,55 @@ export class ModalUsuarioComponent implements OnInit {
     return camposBasicos && ciValido && emailValido && fechaValida && this.passwordValid && this.passwordMatch;
   }
 
-  guardar(): void {
-    if (!this.formularioValido()) return;
+  // En modal-usuario.ts, modifica la función guardar():
 
-    this.loading = true;
-    const usuarioToSend = {
-      nombre: this.usuario.nombre,
-      apellido_paterno: this.usuario.apellido_paterno,
-      apellido_materno: this.usuario.apellido_materno || '',
-      ci: this.usuario.ci,
-      email: this.usuario.email,
-      fecha_nacimiento: this.usuario.fecha_nacimiento || null,
-      direccion: this.usuario.direccion || '',
-      telefono: this.usuario.telefono || '',
-      genero: this.usuario.genero || '',
-      estado: 'activo'  // Siempre activo
-    };
+guardar(): void {
+  if (!this.formularioValido()) return;
 
-    if (!this.editando) {
-      (usuarioToSend as any).password = this.usuario.password;
-      this.usuarioService.createUsuario(usuarioToSend).subscribe({
-        next: () => {
-          this.loading = false;
-          this.usuarioGuardado.emit();
-          this.cerrar();
-        },
-        error: (err) => {
-          this.loading = false;
-          alert('Error al crear usuario');
-          console.error(err);
-        }
-      });
-    } else {
-      this.loading = false;
-      alert('Edición pendiente de implementar');
-      this.cerrar();
-    }
+  this.loading = true;
+  const usuarioToSend = {
+    nombre: this.usuario.nombre,
+    apellido_paterno: this.usuario.apellido_paterno,
+    apellido_materno: this.usuario.apellido_materno || '',
+    ci: this.usuario.ci,
+    email: this.usuario.email,
+    fecha_nacimiento: this.usuario.fecha_nacimiento || null,
+    direccion: this.usuario.direccion || '',
+    telefono: this.usuario.telefono || '',
+    genero: this.usuario.genero || '',
+    estado: 'activo'
+  };
+
+  if (!this.editando) {
+    (usuarioToSend as any).password = this.usuario.password;
+    this.usuarioService.createUsuario(usuarioToSend).subscribe({
+      next: () => {
+        this.loading = false;
+        this.usuarioGuardado.emit();  // 👈 EMITE EVENTO
+        this.cerrar();  // 👈 CIERRA MODAL
+      },
+      error: (err) => {
+        this.loading = false;
+        alert('Error al crear usuario');
+        console.error(err);
+      }
+    });
+  } else {
+    // Para editar, también debes emitir el evento
+    this.usuarioService.updateUsuario(this.usuario.id!, usuarioToSend).subscribe({
+      next: () => {
+        this.loading = false;
+        this.usuarioGuardado.emit();  // 👈 EMITE EVENTO
+        this.cerrar();  // 👈 CIERRA MODAL
+      },
+      error: (err) => {
+        this.loading = false;
+        alert('Error al editar usuario');
+        console.error(err);
+      }
+    });
   }
+}
 
   cerrar(): void {
     this.cerrarModal.emit();

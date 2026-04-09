@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import User, Tutor, Paciente
 from .models import Cama, Paciente
+from .models import OmsRef, FrisanchoRef, Medida, Evaluacion
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -89,3 +90,50 @@ class CamaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cama
         fields = ['id', 'numero', 'ubicacion', 'estado_cama', 'estado', 'paciente', 'paciente_info', 'created_at', 'updated_at']
+
+# ========== OMS REF ==========
+class OmsRefSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OmsRef
+        fields = ['id', 'genero', 'edad_meses', 
+                  'imc_menos_sd', 'imc_mediana', 'imc_mas_sd',
+                  'talla_menos_sd_cm', 'talla_mediana_cm', 'talla_mas_sd_cm']
+
+# ========== FRISANCHO REF ==========
+class FrisanchoRefSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FrisanchoRef
+        fields = ['id', 'genero', 'edad_anios',
+                  'pb_menos_sd', 'pb_dato', 'pb_mas_sd',
+                  'pct_menos_sd', 'pct_dato', 'pct_mas_sd',
+                  'cmb_menos_sd', 'cmb_dato', 'cmb_mas_sd',
+                  'amb_menos_sd', 'amb_dato', 'amb_mas_sd',
+                  'agb_menos_sd', 'agb_dato', 'agb_mas_sd']
+
+# ========== MEDIDA ==========
+class MedidaSerializer(serializers.ModelSerializer):
+    paciente_nombre = serializers.CharField(source='paciente.nombre', read_only=True)
+    
+    class Meta:
+        model = Medida
+        fields = ['id', 'paciente', 'paciente_nombre', 'fecha', 'edad_meses',
+                  'peso_kg', 'talla_cm', 'pb_mm', 'pct_mm', 'estado']
+
+# ========== EVALUACION ==========
+class EvaluacionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Evaluacion
+        fields = '__all__'
+        read_only_fields = ['created_at', 'updated_at']
+
+# ========== EVALUACION CON DETALLES ==========
+class EvaluacionDetalleSerializer(serializers.ModelSerializer):
+    oms_ref = OmsRefSerializer(read_only=True)
+    frisancho_ref = FrisanchoRefSerializer(read_only=True)
+    medida = MedidaSerializer(read_only=True)
+    registrado_por_nombre = serializers.CharField(source='registrado_por.nombre', read_only=True)
+    
+    class Meta:
+        model = Evaluacion
+        fields = '__all__'
+        read_only_fields = ['created_at', 'updated_at']

@@ -1,297 +1,123 @@
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
   <div class="max-w-7xl mx-auto">
     
-    <!-- Header -->
-    <div class="mb-6 flex justify-between items-center">
+    <div class="mb-6 flex justify-between items-center" data-aos="fade-down">
       <div>
-        <h1 class="text-3xl font-bold text-gray-800 flex items-center gap-2">
-          <span class="text-4xl">📐</span> Cálculos Detallados
+        <h1 class="text-3xl font-bold bg-gradient-to-r from-purple-500 to-pink-600 bg-clip-text text-transparent">
+          📐 Cálculos Detallados
         </h1>
         <p class="text-gray-600 mt-1">Desglose paso a paso de todas las fórmulas aplicadas</p>
       </div>
-      <a routerLink="/evaluacion" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
+      <button (click)="volver()" class="px-4 py-2 bg-gray-500 text-white rounded-xl hover:bg-gray-600 transition">
         ← Volver a Resultados
-      </a>
+      </button>
     </div>
 
-    <!-- DATOS DE EJEMPLO (FIJOS) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-      <!-- Paciente -->
-      <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-blue-500">
-        <h3 class="font-bold text-gray-700 mb-3 flex items-center gap-2">
-          <span class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs">1</span>
-          Datos del Paciente (Ejemplo)
-        </h3>
-        <div class="grid grid-cols-2 gap-2 text-sm">
-          <p class="text-gray-500">Nombre:</p>
-          <p class="font-medium">Juan Pérez</p>
-          <p class="text-gray-500">CI:</p>
-          <p class="font-medium">12345678</p>
-          <p class="text-gray-500">Género:</p>
-          <p class="font-medium">Masculino</p>
-          <p class="text-gray-500">Fecha Nacimiento:</p>
-          <p class="font-medium">25/03/2016</p>
-        </div>
+    @if (loading) {
+      <div class="flex justify-center items-center h-64">
+        <div class="animate-spin rounded-full h-16 w-16 border-4 border-purple-500 border-t-transparent"></div>
       </div>
-      
-      <!-- Medición -->
-      <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-green-500">
-        <h3 class="font-bold text-gray-700 mb-3 flex items-center gap-2">
-          <span class="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs">2</span>
-          Datos de Medición (Ejemplo)
-        </h3>
-        <div class="grid grid-cols-2 gap-2 text-sm">
-          <p class="text-gray-500">Fecha Medición:</p>
-          <p class="font-medium">25/03/2026</p>
-          <p class="text-gray-500">Edad:</p>
-          <p class="font-medium">120 meses</p>
-          <p class="text-gray-500">Peso:</p>
-          <p class="font-medium">32.50 kg</p>
-          <p class="text-gray-500">Talla:</p>
-          <p class="font-medium">145.5 cm</p>
-          <p class="text-gray-500">Perímetro Braquial (PB):</p>
-          <p class="font-medium">220 mm</p>
-          <p class="text-gray-500">Pliegue Tricipital (PCT):</p>
-          <p class="font-medium">12.5 mm</p>
-        </div>
-      </div>
-    </div>
+    }
 
-    <!-- 1. CÁLCULO IMC -->
-    <div class="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
-      <div class="bg-blue-600 text-white px-5 py-3">
-        <h2 class="font-bold text-lg flex items-center gap-2">
-          <span class="w-6 h-6 bg-white text-blue-600 rounded-full flex items-center justify-center text-sm">1</span>
-          Índice de Masa Corporal (IMC)
-        </h2>
-      </div>
-      <div class="p-5">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <p class="text-gray-600 mb-2"><strong>Fórmula:</strong> IMC = peso (kg) / [talla (m)]²</p>
-            <div class="bg-gray-50 p-4 rounded-lg font-mono text-sm">
-              <p>IMC = 32.50 / [1.455]²</p>
-              <p class="mt-2">IMC = 32.50 / 2.1170</p>
-              <p class="mt-2 text-blue-600 font-bold">IMC = 15.35 kg/m²</p>
+    @if (!loading && calculos) {
+      <!-- IMC -->
+      <div class="bg-white rounded-2xl shadow-xl mb-6 overflow-hidden" data-aos="fade-up">
+        <div class="bg-blue-600 text-white px-5 py-3">
+          <h2 class="font-bold text-lg">1. Índice de Masa Corporal (IMC)</h2>
+        </div>
+        <div class="p-5">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p class="text-gray-600 mb-2"><strong>Fórmula:</strong> IMC = peso (kg) / [talla (m)]²</p>
+              <div class="bg-gray-50 p-4 rounded-lg font-mono text-sm">
+                <p>IMC = {{ calculos.imc?.peso_kg }} / [{{ calculos.imc?.talla_metros | number:'1.3f' }}]²</p>
+                <p class="mt-2">IMC = {{ calculos.imc?.peso_kg }} / {{ calculos.imc?.talla_metros * calculos.imc?.talla_metros | number:'1.4f' }}</p>
+                <p class="mt-2 text-blue-600 font-bold">IMC = {{ calculos.imc?.resultado | number:'1.2f' }} kg/m²</p>
+              </div>
             </div>
-          </div>
-          <div class="bg-blue-50 p-4 rounded-lg">
-            <p class="font-semibold text-blue-800 mb-2">📝 Desarrollo:</p>
-            <ul class="text-sm space-y-1 text-blue-700">
-              <li>• Convertir talla a metros: 145.5 cm ÷ 100 = 1.455 m</li>
-              <li>• Talla al cuadrado: (1.455)² = 2.1170 m²</li>
-              <li>• Peso ÷ talla²: 32.50 ÷ 2.1170 = 15.35</li>
-            </ul>
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <p class="font-semibold text-blue-800 mb-2">📝 Desarrollo:</p>
+              <ul class="text-sm space-y-1 text-blue-700">
+                <li>• Convertir talla a metros: {{ calculos.imc?.talla_cm }} cm ÷ 100 = {{ calculos.imc?.talla_metros | number:'1.3f' }} m</li>
+                <li>• Talla al cuadrado: ({{ calculos.imc?.talla_metros | number:'1.3f' }})² = {{ calculos.imc?.talla_metros * calculos.imc?.talla_metros | number:'1.4f' }} m²</li>
+                <li>• Peso ÷ talla²: {{ calculos.imc?.peso_kg }} ÷ {{ calculos.imc?.talla_metros * calculos.imc?.talla_metros | number:'1.4f' }}</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- 2. MEDIDAS DERIVADAS -->
-    <div class="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
-      <div class="bg-green-600 text-white px-5 py-3">
-        <h2 class="font-bold text-lg flex items-center gap-2">
-          <span class="w-6 h-6 bg-white text-green-600 rounded-full flex items-center justify-center text-sm">2</span>
-          Medidas Antropométricas Derivadas
-        </h2>
-      </div>
-      <div class="p-5">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- CMB -->
-          <div class="border rounded-lg p-4">
-            <h3 class="font-bold text-blue-600 mb-3">CMB - Circunferencia Muscular Braquial</h3>
-            <p class="text-sm text-gray-600">Fórmula: CMB = PB - (π × PCT)</p>
-            <div class="bg-gray-50 p-3 rounded-lg mt-2 text-sm font-mono">
-              <p>CMB = 220 - (3.1416 × 12.5)</p>
-              <p>CMB = 220 - 39.27</p>
-              <p class="text-blue-600 font-bold mt-1">CMB = 180.73 mm</p>
+      <!-- Medidas Derivadas -->
+      <div class="bg-white rounded-2xl shadow-xl mb-6 overflow-hidden" data-aos="fade-up" data-aos-delay="100">
+        <div class="bg-green-600 text-white px-5 py-3">
+          <h2 class="font-bold text-lg">2. Medidas Antropométricas Derivadas</h2>
+        </div>
+        <div class="p-5">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="border rounded-lg p-4">
+              <h3 class="font-bold text-blue-600 mb-3">CMB - Circunferencia Muscular Braquial</h3>
+              <p class="text-sm text-gray-600">Fórmula: CMB = PB - (π × PCT)</p>
+              <div class="bg-gray-50 p-3 rounded-lg mt-2 text-sm font-mono">
+                <p>CMB = {{ calculos.cmb?.pb_mm }} - (3.1416 × {{ calculos.cmb?.pct_mm }})</p>
+                <p>CMB = {{ calculos.cmb?.pb_mm }} - {{ 3.1416 * calculos.cmb?.pct_mm | number:'1.2f' }}</p>
+                <p class="text-blue-600 font-bold mt-1">CMB = {{ calculos.cmb?.resultado | number:'1.1f' }} mm</p>
+              </div>
             </div>
-          </div>
-          
-          <!-- AMB -->
-          <div class="border rounded-lg p-4">
-            <h3 class="font-bold text-green-600 mb-3">AMB - Área Muscular Braquial</h3>
-            <p class="text-sm text-gray-600">Fórmula: AMB = (CMB² / 4π) - 100</p>
-            <div class="bg-gray-50 p-3 rounded-lg mt-2 text-sm font-mono">
-              <p>AMB = (180.73² / 12.57) - 100</p>
-              <p>AMB = (32,663.33 / 12.57) - 100</p>
-              <p>AMB = 2,598.68 - 100</p>
-              <p class="text-green-600 font-bold mt-1">AMB = 2,498.68 mm²</p>
+            <div class="border rounded-lg p-4">
+              <h3 class="font-bold text-green-600 mb-3">AMB - Área Muscular Braquial</h3>
+              <p class="text-sm text-gray-600">Fórmula: AMB = (CMB² / 4π) - 100</p>
+              <div class="bg-gray-50 p-3 rounded-lg mt-2 text-sm font-mono">
+                <p>AMB = ({{ calculos.amb?.cmb | number:'1.1f' }}² / 12.57) - 100</p>
+                <p>AMB = {{ calculos.amb?.cmb * calculos.amb?.cmb | number:'1.2f' }} / 12.57 - 100</p>
+                <p class="text-green-600 font-bold mt-1">AMB = {{ calculos.amb?.resultado | number:'1.1f' }} mm²</p>
+              </div>
             </div>
-          </div>
-          
-          <!-- AGB -->
-          <div class="border rounded-lg p-4">
-            <h3 class="font-bold text-orange-600 mb-3">AGB - Área Grasa Braquial</h3>
-            <p class="text-sm text-gray-600">Fórmula: AGB = (PB² / 4π) - (AMB + 100)</p>
-            <div class="bg-gray-50 p-3 rounded-lg mt-2 text-sm font-mono">
-              <p>AGB = (220² / 12.57) - (2,498.68 + 100)</p>
-              <p>AGB = (48,400 / 12.57) - 2,598.68</p>
-              <p>AGB = 3,850.44 - 2,598.68</p>
-              <p class="text-orange-600 font-bold mt-1">AGB = 1,251.76 mm²</p>
+            <div class="border rounded-lg p-4">
+              <h3 class="font-bold text-orange-600 mb-3">AGB - Área Grasa Braquial</h3>
+              <p class="text-sm text-gray-600">Fórmula: AGB = (PB² / 4π) - (AMB + 100)</p>
+              <div class="bg-gray-50 p-3 rounded-lg mt-2 text-sm font-mono">
+                <p>AGB = ({{ calculos.agb?.pb_mm }}² / 12.57) - ({{ calculos.agb?.amb | number:'1.1f' }} + 100)</p>
+                <p class="text-orange-600 font-bold mt-1">AGB = {{ calculos.agb?.resultado | number:'1.1f' }} mm²</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- 3. Z-SCORES OMS -->
-    <div class="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
-      <div class="bg-yellow-600 text-white px-5 py-3">
-        <h2 class="font-bold text-lg flex items-center gap-2">
-          <span class="w-6 h-6 bg-white text-yellow-600 rounded-full flex items-center justify-center text-sm">3</span>
-          Z-Scores (Referencia OMS)
-        </h2>
-      </div>
-      <div class="p-5">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Z-IMC -->
-          <div class="border rounded-lg p-4">
-            <h3 class="font-bold mb-3">📊 Z-Score IMC</h3>
-            <p class="text-sm text-gray-600 mb-2">Valor paciente: 15.35</p>
-            <p class="text-sm text-gray-600">Referencia OMS: Mediana=16.5, +1SD=18.2, -1SD=14.8</p>
-            <div class="bg-gray-50 p-3 rounded-lg mt-3 text-sm font-mono">
-              <p>Z = (valor - mediana) / (mediana - (-1SD))</p>
-              <p>Z = (15.35 - 16.5) / (16.5 - 14.8)</p>
-              <p>Z = (-1.15) / (1.7)</p>
-              <p class="text-yellow-700 font-bold mt-1">Z-Score = -0.676</p>
-            </div>
-            <div class="mt-2 p-2 bg-yellow-50 rounded">
-              <p class="text-sm text-yellow-800">📌 Diagnóstico: Sobrepeso leve según IMC</p>
-            </div>
-          </div>
-          
-          <!-- Z-TALLA -->
-          <div class="border rounded-lg p-4">
-            <h3 class="font-bold mb-3">📏 Z-Score Talla</h3>
-            <p class="text-sm text-gray-600 mb-2">Valor paciente: 145.5 cm</p>
-            <p class="text-sm text-gray-600">Referencia OMS: Mediana=145.0, +1SD=152.5, -1SD=137.5</p>
-            <div class="bg-gray-50 p-3 rounded-lg mt-3 text-sm font-mono">
-              <p>Z = (valor - mediana) / (+1SD - mediana)</p>
-              <p>Z = (145.5 - 145.0) / (152.5 - 145.0)</p>
-              <p>Z = (0.5) / (7.5)</p>
-              <p class="text-yellow-700 font-bold mt-1">Z-Score = +0.067</p>
-            </div>
-            <div class="mt-2 p-2 bg-green-50 rounded">
-              <p class="text-sm text-green-800">📌 Diagnóstico: Talla adecuada para la edad</p>
-            </div>
-          </div>
+      <!-- Z-Scores OMS -->
+      <div class="bg-white rounded-2xl shadow-xl mb-6 overflow-hidden" data-aos="fade-up" data-aos-delay="200">
+        <div class="bg-yellow-600 text-white px-5 py-3">
+          <h2 class="font-bold text-lg">3. Z-Scores (Referencia OMS)</h2>
         </div>
-        
-        <!-- Peso Ideal -->
-        <div class="mt-4 bg-blue-50 rounded-lg p-4">
-          <h3 class="font-bold text-blue-800 mb-2">⚖️ Peso Ideal y Diferencia</h3>
-          <p class="text-sm">Fórmula: Peso Ideal = IMC_mediana × (talla en metros)²</p>
-          <div class="font-mono text-sm mt-2">
-            <p>Peso Ideal = 16.5 × (1.455)²</p>
-            <p>Peso Ideal = 16.5 × 2.1170</p>
-            <p class="font-bold">Peso Ideal = 34.93 kg</p>
-            <p class="mt-2">Diferencia = Peso Actual - Peso Ideal = 32.50 - 34.93</p>
-            <p class="font-bold text-red-600">Diferencia = -2.43 kg (por debajo del peso ideal)</p>
+        <div class="p-5">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="border rounded-lg p-4">
+              <h3 class="font-bold mb-3">📊 Z-Score IMC</h3>
+              <p class="text-sm text-gray-600">Valor paciente: {{ calculos.z_imc?.valor | number:'1.2f' }}</p>
+              <div class="bg-gray-50 p-3 rounded-lg mt-3 text-sm font-mono">
+                <p>{{ calculos.z_imc?.formula }}</p>
+                <p class="text-yellow-700 font-bold mt-1">Z-Score = {{ calculos.z_imc?.resultado | number:'1.3f' }}</p>
+              </div>
+            </div>
+            <div class="border rounded-lg p-4">
+              <h3 class="font-bold mb-3">📏 Z-Score Talla</h3>
+              <p class="text-sm text-gray-600">Valor paciente: {{ calculos.z_talla?.valor | number:'1.1f' }} cm</p>
+              <div class="bg-gray-50 p-3 rounded-lg mt-3 text-sm font-mono">
+                <p>{{ calculos.z_talla?.formula }}</p>
+                <p class="text-yellow-700 font-bold mt-1">Z-Score = {{ calculos.z_talla?.resultado | number:'1.3f' }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 bg-blue-50 rounded-lg p-4">
+            <h3 class="font-bold text-blue-800 mb-2">⚖️ Peso Ideal y Diferencia</h3>
+            <p class="text-sm">Peso Ideal = {{ calculos.peso_ideal?.imc_mediana }} × ({{ calculos.imc?.talla_metros | number:'1.3f' }})²</p>
+            <p class="font-bold">Peso Ideal = {{ calculos.peso_ideal?.resultado | number:'1.2f' }} kg</p>
+            <p class="mt-2">Diferencia = Peso Actual - Peso Ideal = {{ calculos.peso_ideal?.diferencia | number:'1.2f' }} kg</p>
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- 4. Z-SCORES FRISANCHO -->
-    <div class="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
-      <div class="bg-red-600 text-white px-5 py-3">
-        <h2 class="font-bold text-lg flex items-center gap-2">
-          <span class="w-6 h-6 bg-white text-red-600 rounded-full flex items-center justify-center text-sm">4</span>
-          Z-Scores (Referencia Frisancho)
-        </h2>
-      </div>
-      <div class="p-5">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <!-- Z-PB -->
-          <div class="border rounded-lg p-3">
-            <h3 class="font-bold text-sm mb-2">📐 Perímetro Braquial (PB)</h3>
-            <p class="text-xs text-gray-500">Valor: 220 mm</p>
-            <p class="text-xs text-gray-500">Ref: Mediana=215, +1SD=235, -1SD=195</p>
-            <div class="bg-gray-50 p-2 rounded-lg mt-2 text-xs font-mono">
-              <p>Z = (220 - 215) / (235 - 215) = 5 / 20</p>
-              <p class="text-red-600 font-bold mt-1">Z = +0.250</p>
-            </div>
-            <div class="mt-2 p-2 bg-green-50 rounded">
-              <p class="text-xs text-green-700">✓ Dentro de parámetros normales</p>
-            </div>
-          </div>
-          
-          <!-- Z-PCT -->
-          <div class="border rounded-lg p-3">
-            <h3 class="font-bold text-sm mb-2">📊 Pliegue Tricipital (PCT)</h3>
-            <p class="text-xs text-gray-500">Valor: 12.5 mm</p>
-            <p class="text-xs text-gray-500">Ref: Mediana=11.5, +1SD=14.0, -1SD=9.0</p>
-            <div class="bg-gray-50 p-2 rounded-lg mt-2 text-xs font-mono">
-              <p>Z = (12.5 - 11.5) / (14.0 - 11.5) = 1.0 / 2.5</p>
-              <p class="text-red-600 font-bold mt-1">Z = +0.400</p>
-            </div>
-            <div class="mt-2 p-2 bg-green-50 rounded">
-              <p class="text-xs text-green-700">✓ Reserva de grasa adecuada</p>
-            </div>
-          </div>
-          
-          <!-- Z-CMB -->
-          <div class="border rounded-lg p-3">
-            <h3 class="font-bold text-sm mb-2">💪 Circunferencia Muscular Braquial (CMB)</h3>
-            <p class="text-xs text-gray-500">Valor: 180.73 mm</p>
-            <p class="text-xs text-gray-500">Ref: Mediana=178, +1SD=195, -1SD=161</p>
-            <div class="bg-gray-50 p-2 rounded-lg mt-2 text-xs font-mono">
-              <p>Z = (180.73 - 178) / (195 - 178) = 2.73 / 17</p>
-              <p class="text-red-600 font-bold mt-1">Z = +0.161</p>
-            </div>
-            <div class="mt-2 p-2 bg-green-50 rounded">
-              <p class="text-xs text-green-700">✓ Masa muscular conservada</p>
-            </div>
-          </div>
-          
-          <!-- Z-AMB -->
-          <div class="border rounded-lg p-3">
-            <h3 class="font-bold text-sm mb-2">🔲 Área Muscular Braquial (AMB)</h3>
-            <p class="text-xs text-gray-500">Valor: 2,498.68 mm²</p>
-            <p class="text-xs text-gray-500">Ref: Mediana=2450, +1SD=2800, -1SD=2100</p>
-            <div class="bg-gray-50 p-2 rounded-lg mt-2 text-xs font-mono">
-              <p>Z = (2498.68 - 2450) / (2800 - 2450) = 48.68 / 350</p>
-              <p class="text-red-600 font-bold mt-1">Z = +0.139</p>
-            </div>
-            <div class="mt-2 p-2 bg-green-50 rounded">
-              <p class="text-xs text-green-700">✓ Área muscular adecuada</p>
-            </div>
-          </div>
-          
-          <!-- Z-AGB -->
-          <div class="border rounded-lg p-3">
-            <h3 class="font-bold text-sm mb-2">🟠 Área Grasa Braquial (AGB)</h3>
-            <p class="text-xs text-gray-500">Valor: 1,251.76 mm²</p>
-            <p class="text-xs text-gray-500">Ref: Mediana=185, +1SD=220, -1SD=150</p>
-            <div class="bg-gray-50 p-2 rounded-lg mt-2 text-xs font-mono">
-              <p>Z = (1251.76 - 185) / (220 - 185) = 1066.76 / 35</p>
-              <p class="text-red-600 font-bold mt-1">Z = +30.48 (Alto)</p>
-            </div>
-            <div class="mt-2 p-2 bg-yellow-50 rounded">
-              <p class="text-xs text-yellow-700">⚠️ Área grasa elevada, riesgo de sobrepeso</p>
-            </div>
-          </div>
-          
-          <!-- Resumen Diagnóstico -->
-          <div class="border rounded-lg p-3 bg-gradient-to-r from-gray-100 to-gray-200">
-            <h3 class="font-bold text-sm mb-2 text-gray-700">📋 Resumen Diagnóstico</h3>
-            <ul class="text-xs space-y-1 text-gray-600">
-              <li>✅ IMC: -0.676 (Normal bajo)</li>
-              <li>✅ Talla: +0.067 (Adecuada)</li>
-              <li>✅ PB: +0.250 (Normal)</li>
-              <li>✅ PCT: +0.400 (Normal)</li>
-              <li>✅ CMB: +0.161 (Normal)</li>
-              <li>✅ AMB: +0.139 (Normal)</li>
-              <li>⚠️ AGB: +30.48 (Muy elevado)</li>
-            </ul>
-            <div class="mt-3 pt-2 border-t border-gray-300">
-              <p class="text-sm font-bold text-orange-600">Diagnóstico Final:</p>
-              <p class="text-xs">Paciente con masa muscular adecuada pero con exceso de grasa corporal. Riesgo de sobrepeso. Recomendar control nutricional y actividad física.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    }
   </div>
 </div>
+
+<ngx-spinner type="ball-scale-multiple" size="medium" color="#3b82f6"></ngx-spinner>

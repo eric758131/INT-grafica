@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { UsuarioService } from '../services/usuario.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -34,12 +35,20 @@ export class LoginComponent {
     this.usuarioService.login(this.email, this.password).subscribe({
       next: (response) => {
         this.loading = false;
+        console.log('Respuesta login:', response);
+        
         if (response.success) {
-           localStorage.setItem('usuario', JSON.stringify(response.user));
-            console.log('Usuario guardado:', localStorage.getItem('usuario')); // Para depurar
-            this.router.navigate(['/dashboard']);
+          localStorage.setItem('usuario', JSON.stringify(response.user));
+          console.log('Usuario guardado en localStorage');
+          
+          // Redirigir al dashboard
+          this.router.navigate(['/dashboard']).then(() => {
+            console.log('Redirigiendo a dashboard');
+          }).catch(err => {
+            console.error('Error al redirigir:', err);
+          });
         } else {
-          this.errorMessage = response.message || 'Error al iniciar sesión';
+          this.errorMessage = response.message || 'Credenciales inválidas';
         }
       },
       error: (error) => {
@@ -47,8 +56,10 @@ export class LoginComponent {
         console.error('Error login:', error);
         if (error.status === 401) {
           this.errorMessage = 'Email o contraseña incorrectos';
+        } else if (error.status === 0) {
+          this.errorMessage = 'Error de conexión. ¿El servidor está corriendo?';
         } else {
-          this.errorMessage = 'Error de conexión con el servidor';
+          this.errorMessage = 'Error al iniciar sesión';
         }
       }
     });

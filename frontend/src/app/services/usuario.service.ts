@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+// ========== INTERFACES EXISTENTES (mantén todas las que ya tienes) ==========
 export interface Usuario {
   id?: number;
   nombre: string;
@@ -38,7 +39,7 @@ export interface Paciente {
   genero: string;
   estado: string;
   tutor_id?: number | null;
-  tutor?: Tutor;  // ← Esto ahora vendrá lleno desde Django
+  tutor?: Tutor;
 }
 
 export interface Cama {
@@ -57,23 +58,95 @@ export interface Cama {
   } | null;
 }
 
-export interface EvaluacionCalculo {
+export interface OmsRef {
+  id: number;
+  genero: string;
   edad_meses: number;
+  imc_menos_sd: number;
+  imc_mediana: number;
+  imc_mas_sd: number;
+  talla_menos_sd_cm: number;
+  talla_mediana_cm: number;
+  talla_mas_sd_cm: number;
+}
+
+export interface FrisanchoRef {
+  id: number;
+  genero: string;
   edad_anios: number;
+  pb_menos_sd: number; pb_dato: number; pb_mas_sd: number;
+  pct_menos_sd: number; pct_dato: number; pct_mas_sd: number;
+  cmb_menos_sd: number; cmb_dato: number; cmb_mas_sd: number;
+  amb_menos_sd: number; amb_dato: number; amb_mas_sd: number;
+  agb_menos_sd: number; agb_dato: number; agb_mas_sd: number;
+}
+
+export interface Medida {
+  id?: number;
+  paciente: number;
+  paciente_nombre?: string;
+  fecha: string;
+  edad_meses: number;
+  peso_kg: number;
+  talla_cm: number;
+  pb_mm: number;
+  pct_mm: number;
+  estado: string;
+}
+
+export interface Evaluacion {
+  id?: number;
+  medida_id: number;
+  medida?: Medida;
+  oms_ref_id: number;
+  frisancho_ref_id: number;
+  oms_ref?: OmsRef;
+  frisancho_ref?: FrisanchoRef;
   imc: number;
-  cmb_mm: number;
-  amb_mm2: number;
-  agb_mm2: number;
-  peso_ideal: number;
-  dif_peso: number;
-  z_scores: {
+  peso_ideal?: number;
+  dif_peso?: number;
+  cmb_mm?: number;
+  amb_mm2?: number;
+  agb_mm2?: number;
+  z_imc?: number; 
+  dx_z_imc?: string;
+  z_talla?: number; 
+  dx_z_talla?: string;
+  z_pb?: number; 
+  dx_z_pb?: string;
+  z_pct?: number; 
+  dx_z_pct?: string;
+  z_cmb?: number; 
+  dx_z_cmb?: string;
+  z_amb?: number; 
+  dx_z_amb?: string;
+  z_agb?: number; 
+  dx_z_agb?: string;
+  registrado_por?: number;
+  registrado_por_nombre?: string;
+  created_at?: string;
+}
+
+export interface CalculosResponse {
+  success: boolean;
+  calculos: {
+    edad_meses: number;
+    edad_anios: number;
     imc: number;
-    talla: number;
-    pb: number;
-    pct: number;
-    cmb: number;
-    amb: number;
-    agb: number;
+    cmb_mm: number;
+    amb_mm2: number;
+    agb_mm2: number;
+    peso_ideal: number;
+    dif_peso: number;
+    z_scores: {
+      imc: number;
+      talla: number;
+      pb: number;
+      pct: number;
+      cmb: number;
+      amb: number;
+      agb: number;
+    };
   };
 }
 
@@ -85,7 +158,7 @@ export class UsuarioService {
 
   constructor(private http: HttpClient) { }
 
-  // Usuarios
+  // ========== USUARIOS ==========
   getUsuarios(): Observable<Usuario[]> {
     return this.http.get<Usuario[]>(`${this.apiUrl}/users/`);
   }
@@ -94,11 +167,14 @@ export class UsuarioService {
     return this.http.post<Usuario>(`${this.apiUrl}/users/`, usuario);
   }
 
+  updateUsuario(id: number, usuario: any): Observable<any> {
+  return this.http.put(`${this.apiUrl}/usuarios/${id}`, usuario);
+}
+
   deleteUsuario(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/users/${id}/`);
   }
 
-  // Login
   login(email: string, password: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/login/`, { email, password });
   }
@@ -126,7 +202,6 @@ export class UsuarioService {
   }
 
   createPaciente(paciente: any): Observable<Paciente> {
-    console.log('🔵 Service - Enviando paciente:', paciente); // Para depurar
     return this.http.post<Paciente>(`${this.apiUrl}/pacientes/`, paciente);
   }
 
@@ -138,13 +213,11 @@ export class UsuarioService {
     return this.http.delete(`${this.apiUrl}/pacientes/${id}/`);
   }
 
-
-
   // ========== CAMAS ==========
   getCamas(): Observable<Cama[]> {
     return this.http.get<Cama[]>(`${this.apiUrl}/camas/`);
   }
-  // Métodos adicionales
+
   asignarPacienteACama(camaId: number, pacienteId: number): Observable<Cama> {
     return this.http.patch<Cama>(`${this.apiUrl}/camas/${camaId}/`, { paciente: pacienteId, estado_cama: 'ocupada' });
   }
@@ -153,40 +226,33 @@ export class UsuarioService {
     return this.http.patch<Cama>(`${this.apiUrl}/camas/${camaId}/`, { paciente: null, estado_cama: 'disponible' });
   }
 
-  // En la clase UsuarioService:
-  calcularEvaluacionEjemplo(datos: any): Observable<EvaluacionCalculo> {
-    // Simulación de cálculo con datos de ejemplo
-    return new Observable(observer => {
-      setTimeout(() => {
-        const tallaMetros = datos.talla_cm / 100;
-        const imc = datos.peso_kg / (tallaMetros * tallaMetros);
-        const cmb = datos.pb_mm - (3.1416 * datos.pct_mm);
-        const amb = ((cmb * cmb) / 12.57) - 100;
-        const agb = ((datos.pb_mm * datos.pb_mm) / 12.57) - (amb + 100);
-        
-        observer.next({
-          edad_meses: 120,
-          edad_anios: 10,
-          imc: parseFloat(imc.toFixed(2)),
-          cmb_mm: parseFloat(cmb.toFixed(1)),
-          amb_mm2: parseFloat(amb.toFixed(1)),
-          agb_mm2: parseFloat(agb.toFixed(1)),
-          peso_ideal: parseFloat((18.5 * tallaMetros * tallaMetros).toFixed(2)),
-          dif_peso: parseFloat((datos.peso_kg - (18.5 * tallaMetros * tallaMetros)).toFixed(2)),
-          z_scores: {
-            imc: parseFloat((Math.random() * 3 - 1.5).toFixed(3)),
-            talla: parseFloat((Math.random() * 3 - 1.5).toFixed(3)),
-            pb: parseFloat((Math.random() * 3 - 1.5).toFixed(3)),
-            pct: parseFloat((Math.random() * 3 - 1.5).toFixed(3)),
-            cmb: parseFloat((Math.random() * 3 - 1.5).toFixed(3)),
-            amb: parseFloat((Math.random() * 3 - 1.5).toFixed(3)),
-            agb: parseFloat((Math.random() * 3 - 1.5).toFixed(3))
-          }
-        });
-        observer.complete();
-      }, 800);
-    });
+  // ========== REFERENCIAS ==========
+  getOmsRefs(): Observable<OmsRef[]> {
+    return this.http.get<OmsRef[]>(`${this.apiUrl}/oms-ref/`);
   }
 
-  
+  getFrisanchoRefs(): Observable<FrisanchoRef[]> {
+    return this.http.get<FrisanchoRef[]>(`${this.apiUrl}/frisancho-ref/`);
+  }
+
+  // ========== EVALUACIÓN ==========
+  calcularPreview(data: any): Observable<CalculosResponse> {
+    return this.http.post<CalculosResponse>(`${this.apiUrl}/medidas/calcular_preview/`, data);
+  }
+
+  guardarEvaluacion(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/medidas/guardar_evaluacion/`, data);
+  }
+
+  getEvaluacionesByPaciente(pacienteId: number): Observable<Evaluacion[]> {
+    return this.http.get<Evaluacion[]>(`${this.apiUrl}/evaluaciones/?medida__paciente=${pacienteId}`);
+  }
+
+  getCalculosDetallados(evaluacionId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/evaluaciones/${evaluacionId}/calculos_detallados/`);
+  }
+
+  getEvaluacionById(id: number): Observable<Evaluacion> {
+    return this.http.get<Evaluacion>(`${this.apiUrl}/evaluaciones/${id}/`);
+  }
 }

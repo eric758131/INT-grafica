@@ -207,3 +207,168 @@ class Cama(models.Model):
     
     def __str__(self):
         return f"Cama {self.numero} - {self.ubicacion}"
+    
+
+# ==================== REFERENCIAS OMS ====================
+class OmsRef(models.Model):
+    GENERO_CHOICES = [
+        ('masculino', 'Masculino'),
+        ('femenino', 'Femenino'),
+    ]
+    
+    genero = models.CharField(max_length=10, choices=GENERO_CHOICES)
+    edad_meses = models.PositiveSmallIntegerField()
+    
+    # IMC
+    imc_menos_sd = models.DecimalField(max_digits=5, decimal_places=2)
+    imc_mediana = models.DecimalField(max_digits=5, decimal_places=2)
+    imc_mas_sd = models.DecimalField(max_digits=5, decimal_places=2)
+    
+    # Talla
+    talla_menos_sd_cm = models.DecimalField(max_digits=5, decimal_places=2)
+    talla_mediana_cm = models.DecimalField(max_digits=5, decimal_places=2)
+    talla_mas_sd_cm = models.DecimalField(max_digits=5, decimal_places=2)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'oms_ref'
+        unique_together = ['genero', 'edad_meses']
+        verbose_name = 'Referencia OMS'
+        verbose_name_plural = 'Referencias OMS'
+    
+    def __str__(self):
+        return f"OMS - {self.genero} - {self.edad_meses} meses"
+
+
+# ==================== REFERENCIAS FRISANCHO ====================
+class FrisanchoRef(models.Model):
+    GENERO_CHOICES = [
+        ('masculino', 'Masculino'),
+        ('femenino', 'Femenino'),
+    ]
+    
+    genero = models.CharField(max_length=10, choices=GENERO_CHOICES)
+    edad_anios = models.PositiveSmallIntegerField()
+    
+    # Perímetro Braquial
+    pb_menos_sd = models.DecimalField(max_digits=6, decimal_places=2)
+    pb_dato = models.DecimalField(max_digits=6, decimal_places=2)
+    pb_mas_sd = models.DecimalField(max_digits=6, decimal_places=2)
+    
+    # Pliegue Tricipital
+    pct_menos_sd = models.DecimalField(max_digits=6, decimal_places=2)
+    pct_dato = models.DecimalField(max_digits=6, decimal_places=2)
+    pct_mas_sd = models.DecimalField(max_digits=6, decimal_places=2)
+    
+    # CMB
+    cmb_menos_sd = models.DecimalField(max_digits=6, decimal_places=2)
+    cmb_dato = models.DecimalField(max_digits=6, decimal_places=2)
+    cmb_mas_sd = models.DecimalField(max_digits=6, decimal_places=2)
+    
+    # AMB
+    amb_menos_sd = models.DecimalField(max_digits=10, decimal_places=2)
+    amb_dato = models.DecimalField(max_digits=10, decimal_places=2)
+    amb_mas_sd = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    # AGB
+    agb_menos_sd = models.DecimalField(max_digits=10, decimal_places=2)
+    agb_dato = models.DecimalField(max_digits=10, decimal_places=2)
+    agb_mas_sd = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'frisancho_ref'
+        unique_together = ['genero', 'edad_anios']
+        verbose_name = 'Referencia Frisancho'
+        verbose_name_plural = 'Referencias Frisancho'
+    
+    def __str__(self):
+        return f"Frisancho - {self.genero} - {self.edad_anios} años"
+
+
+# ==================== MEDIDAS ====================
+class Medida(models.Model):
+    ESTADO_CHOICES = [
+        ('Activo', 'Activo'),
+        ('Inactivo', 'Inactivo'),
+    ]
+    
+    paciente = models.ForeignKey('Paciente', on_delete=models.CASCADE, related_name='medidas')
+    fecha = models.DateField()
+    edad_meses = models.PositiveSmallIntegerField()  # snapshot para reproducibilidad
+    peso_kg = models.DecimalField(max_digits=6, decimal_places=2)
+    talla_cm = models.DecimalField(max_digits=5, decimal_places=2)
+    pb_mm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    pct_mm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='Activo')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'medidas'
+        verbose_name = 'Medida'
+        verbose_name_plural = 'Medidas'
+    
+    def __str__(self):
+        return f"Medida {self.id} - {self.paciente} - {self.fecha}"
+
+
+# ==================== EVALUACIONES ====================
+class Evaluacion(models.Model):
+    medida = models.ForeignKey('Medida', on_delete=models.CASCADE, related_name='evaluaciones')
+    oms_ref = models.ForeignKey('OmsRef', on_delete=models.RESTRICT)
+    frisancho_ref = models.ForeignKey('FrisanchoRef', on_delete=models.RESTRICT)
+    
+    # Derivados
+    imc = models.DecimalField(max_digits=5, decimal_places=2)
+    peso_ideal = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    dif_peso = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    cmb_mm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    amb_mm2 = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    agb_mm2 = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    
+    # Z-scores OMS
+    z_imc = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
+    dx_z_imc = models.CharField(max_length=100, null=True, blank=True)
+    
+    z_talla = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
+    dx_z_talla = models.CharField(max_length=100, null=True, blank=True)
+    
+    # Z-scores Frisancho
+    z_pb = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
+    dx_z_pb = models.CharField(max_length=100, null=True, blank=True)
+    
+    z_pct = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
+    dx_z_pct = models.CharField(max_length=100, null=True, blank=True)
+    
+    z_cmb = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
+    dx_z_cmb = models.CharField(max_length=100, null=True, blank=True)
+    
+    z_amb = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
+    dx_z_amb = models.CharField(max_length=100, null=True, blank=True)
+    
+    z_agb = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
+    dx_z_agb = models.CharField(max_length=100, null=True, blank=True)
+    
+    registrado_por = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True, related_name='evaluaciones')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'evaluaciones'
+        verbose_name = 'Evaluación'
+        verbose_name_plural = 'Evaluaciones'
+        indexes = [
+            models.Index(fields=['medida_id']),
+            models.Index(fields=['oms_ref_id']),
+            models.Index(fields=['frisancho_ref_id']),
+        ]
+    
+    def __str__(self):
+        return f"Evaluación {self.id} - Medida {self.medida_id}"
+    

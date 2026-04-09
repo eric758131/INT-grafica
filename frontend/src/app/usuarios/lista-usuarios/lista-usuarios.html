@@ -7,30 +7,61 @@
     </button>
   </div>
 
+  <!-- Indicador de carga -->
+  @if (loading) {
+    <div class="flex justify-center items-center h-64">
+      <div class="animate-spin rounded-full h-12 w-12 border-4 border-green-500 border-t-transparent"></div>
+    </div>
+  }
+
   <!-- Tabla de usuarios -->
-  <div class="overflow-x-auto">
-    <table class="min-w-full bg-white">
-      <thead class="bg-gradient-to-r from-gray-100 to-gray-200">
-        <tr><th class="p-3">CI</th><th>Nombre</th><th>Email</th><th>Estado</th><th>Acciones</th></tr>
-      </thead>
-      <tbody>
-        @for (u of usuarios; track u.id) {
-          <tr class="hover:bg-gray-50">
-            <td class="p-3">{{u.ci}}</td>
-            <td>{{u.nombre}} {{u.apellido_paterno}}</td>
-            <td>{{u.email}}</td>
-            <td><span class="px-2 py-1 rounded-full text-xs" [class.bg-green-100]="u.estado==='activo'" [class.bg-red-100]="u.estado!=='activo'">{{u.estado}}</span></td>
-            <td>
-              <button (click)="abrirModalEditar(u)" class="text-blue-600 mr-2">✏️</button>
-              <button (click)="eliminarUsuario(u.id!)" class="text-red-600">🗑️</button>
-            </td>
+  @if (!loading) {
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white">
+        <thead class="bg-gradient-to-r from-gray-100 to-gray-200">
+          <tr>
+            <th class="p-3">CI</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Estado</th>
+            <th>Acciones</th>
           </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          @for (u of usuarios; track u.id) {
+            <tr class="hover:bg-gray-50">
+              <td class="p-3">{{u.ci}}</td>
+              <td>{{u.nombre}} {{u.apellido_paterno}}</td>
+              <td>{{u.email}}</td>
+              <td>
+                <span class="px-2 py-1 rounded-full text-xs" 
+                  [class.bg-green-100]="u.estado==='activo'" 
+                  [class.bg-red-100]="u.estado!=='activo'">
+                  {{u.estado}}
+                </span>
+              </td>
+              <td>
+                <button (click)="abrirModalEditar(u)" class="text-blue-600 mr-2">✏️</button>
+                <button (click)="eliminarUsuario(u.id!)" class="text-red-600">🗑️</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="text-center p-8 text-gray-500">
+                No hay usuarios registrados
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
 </div>
 
 @if (mostrarModal) {
-  <app-modal-usuario [usuarioEditar]="usuarioSeleccionado" (cerrarModal)="cerrarModal()" (usuarioGuardado)="recargar()"></app-modal-usuario>
+  <app-modal-usuario 
+    [usuarioEditar]="usuarioSeleccionado" 
+    (cerrarModal)="cerrarModal()" 
+    (usuarioGuardado)="recargar()">
+  </app-modal-usuario>
 }

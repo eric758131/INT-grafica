@@ -1,7 +1,11 @@
-/* You can add global styles to this file, and also import other style files */
+@charset "UTF-8";
 
-@import "tailwindcss";
-@import 'animate.css/animate.min.css';
+/* You can add global styles to this file, and also import other style files */
+@layer theme {
+  @import "tailwindcss";
+  @import 'animate.css/animate.min.css';
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;

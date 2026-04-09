@@ -1,108 +1,55 @@
-<aside class="fixed top-0 left-0 h-screen w-64 bg-gradient-to-b from-indigo-900 to-purple-900 text-white flex flex-col shadow-2xl z-50">
+<aside class="fixed top-0 left-0 h-screen w-64 bg-gradient-to-br from-indigo-600 via-purple-700 to-purple-900 text-white flex flex-col shadow-2xl z-50">
   
-  <!-- Logo / Título del Sistema -->
   <div class="p-6 border-b border-white/20">
     <h1 class="text-2xl font-bold text-center">Sistema Gestión</h1>
-    <p class="text-xs text-center text-white/75 mt-1">v1.0.0</p>
+    <p class="text-xs text-center text-white/80 mt-1">v1.0.0</p>
   </div>
 
-  <!-- Menú de Navegación - con scroll interno si es necesario -->
   <nav class="flex-1 overflow-y-auto py-6">
-    <ul class="space-y-1">
-      <!-- Dashboard -->
+    <ul class="space-y-2 px-3">
       <li>
-        <a (click)="navigateTo('dashboard')" 
-           class="flex items-center px-6 py-3 cursor-pointer transition hover:bg-indigo-800/60"
-           [class.bg-indigo-800/60]="activeMenu === 'dashboard'">
-          <span class="material-icons mr-3 text-2xl">dashboard</span>
-          <span>Dashboard</span>
+        <a (click)="navigateTo('usuarios')" 
+           class="flex items-center px-4 py-3 cursor-pointer transition-all duration-300 rounded-xl font-semibold"
+           [class.bg-white/25]="activeMenu === 'usuarios'">
+          <span class="material-icons mr-3 text-2xl">people</span>
+          <span>Usuarios</span>
         </a>
       </li>
 
-      <!-- Usuarios -->
       <li>
-        <div (click)="toggleUsuarios()" 
-             class="flex items-center justify-between px-6 py-3 cursor-pointer transition hover:bg-indigo-800/60">
-          <div class="flex items-center">
-            <span class="material-icons mr-3 text-2xl">people</span>
-            <span>Usuarios</span>
-          </div>
-          <span class="material-icons transition-transform" [style.transform]="showUsuariosSubmenu ? 'rotate(180deg)' : 'rotate(0deg)'">expand_more</span>
-        </div>
-        @if (showUsuariosSubmenu) {
-          <ul class="ml-12 mt-1 space-y-1">
-            <li><a (click)="navigateTo('usuarios/lista')" class="flex items-center py-2 px-4 cursor-pointer hover:bg-indigo-800/40"><span class="material-icons mr-2 text-lg">list</span>Lista</a></li>
-            <li><a (click)="navigateTo('usuarios/crear')" class="flex items-center py-2 px-4 cursor-pointer hover:bg-indigo-800/40"><span class="material-icons mr-2 text-lg">add_circle</span>Crear</a></li>
-          </ul>
-        }
-      </li>
-
-      <!-- Pacientes -->
-      <li>
-        <div (click)="togglePacientes()" 
-             class="flex items-center justify-between px-6 py-3 cursor-pointer transition hover:bg-indigo-800/60">
-          <div class="flex items-center">
-            <span class="material-icons mr-3 text-2xl">health_and_safety</span>
-            <span>Pacientes</span>
-          </div>
-          <span class="material-icons transition-transform" [style.transform]="showPacientesSubmenu ? 'rotate(180deg)' : 'rotate(0deg)'">expand_more</span>
-        </div>
-        @if (showPacientesSubmenu) {
-          <ul class="ml-12 mt-1 space-y-1">
-            <li><a (click)="navigateTo('pacientes/lista')" class="flex items-center py-2 px-4 cursor-pointer hover:bg-indigo-800/40"><span class="material-icons mr-2 text-lg">list</span>Lista</a></li>
-            <li><a (click)="navigateTo('pacientes/crear')" class="flex items-center py-2 px-4 cursor-pointer hover:bg-indigo-800/40"><span class="material-icons mr-2 text-lg">add_circle</span>Crear</a></li>
-          </ul>
-        }
-      </li>
-
-      <!-- Camas -->
-      <li>
-        <div (click)="toggleCamas()" 
-             class="flex items-center justify-between px-6 py-3 cursor-pointer transition hover:bg-indigo-800/60">
-          <div class="flex items-center">
-            <span class="material-icons mr-3 text-2xl">hotel</span>
-            <span>Camas</span>
-          </div>
-          <span class="material-icons transition-transform" [style.transform]="showCamasSubmenu ? 'rotate(180deg)' : 'rotate(0deg)'">expand_more</span>
-        </div>
-        @if (showCamasSubmenu) {
-          <ul class="ml-12 mt-1 space-y-1">
-            <li><a (click)="navigateTo('camas/seleccion')" class="flex items-center py-2 px-4 cursor-pointer hover:bg-indigo-800/40"><span class="material-icons mr-2 text-lg">king_bed</span>Seleccionar Cama</a></li>
-          </ul>
-        }
+        <a (click)="navigateTo('pacientes')" 
+           class="flex items-center px-4 py-3 cursor-pointer transition-all duration-300 rounded-xl font-semibold"
+           [class.bg-white/25]="activeMenu === 'pacientes'">
+          <span class="material-icons mr-3 text-2xl">health_and_safety</span>
+          <span>Pacientes</span>
+        </a>
       </li>
 
       <li>
-        <div (click)="toggleEvaluacion()" 
-            class="flex items-center justify-between px-6 py-3 cursor-pointer transition hover:bg-indigo-800/60">
-          <div class="flex items-center">
-            <span class="material-icons mr-3 text-2xl">calculate</span>
-            <span>Evaluación</span>
-          </div>
-          <span class="material-icons transition-transform" [style.transform]="showEvaluacionSubmenu ? 'rotate(180deg)' : 'rotate(0deg)'">expand_more</span>
-        </div>
-        @if (showEvaluacionSubmenu) {
-          <ul class="ml-12 mt-1 space-y-1">
-            <li><a (click)="navigateTo('evaluacion/calculadora')" class="flex items-center py-2 px-4 cursor-pointer hover:bg-indigo-800/40"><span class="material-icons mr-2 text-lg">science</span>Calculadora</a></li>
-          </ul>
-        }
+        <a (click)="navigateTo('camas')" 
+           class="flex items-center px-4 py-3 cursor-pointer transition-all duration-300 rounded-xl font-semibold"
+           [class.bg-white/25]="activeMenu === 'camas'">
+          <span class="material-icons mr-3 text-2xl">hotel</span>
+          <span>Camas</span>
+        </a>
       </li>
 
-      <!-- Separador -->
-      <li class="px-6 py-2"><hr class="border-white/20"></li>
-
-      <!-- Módulos Futuros -->
-      <li><div class="flex items-center px-6 py-3 opacity-50"><span class="material-icons mr-3 text-2xl">event</span><span>Citas</span></div></li>
-      <li><div class="flex items-center px-6 py-3 opacity-50"><span class="material-icons mr-3 text-2xl">payments</span><span>Pagos</span></div></li>
+      <li>
+        <a (click)="navigateTo('evaluacion')" 
+           class="flex items-center px-4 py-3 cursor-pointer transition-all duration-300 rounded-xl font-semibold"
+           [class.bg-white/25]="activeMenu === 'evaluacion'">
+          <span class="material-icons mr-3 text-2xl">science</span>
+          <span>Evaluaciones</span>
+        </a>
+      </li>
     </ul>
   </nav>
 
-  <!-- Footer del Sidebar (Cerrar Sesión) - Siempre abajo -->
   <div class="p-4 border-t border-white/20">
-    <a (click)="logout()" 
-       class="flex items-center px-4 py-3 rounded-lg cursor-pointer transition-all duration-300 hover:bg-red-600/80">
-      <span class="material-icons mr-3 text-2xl">logout</span>
-      <span>Cerrar Sesión</span>
-    </a>
+    <button (click)="logout()" 
+       class="w-full flex items-center justify-center px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-lg">
+      <span class="material-icons mr-2 text-xl">logout</span>
+      <span class="font-bold">Cerrar Sesión</span>
+    </button>
   </div>
 </aside>

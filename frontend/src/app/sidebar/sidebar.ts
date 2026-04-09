@@ -10,14 +10,9 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./sidebar.css']
 })
 export class SidebarComponent implements OnInit {
-  showUsuariosSubmenu = true;
-  showPacientesSubmenu = true;
-  showCamasSubmenu = true;
-  showEvaluacionSubmenu = true;
   activeMenu: string = '';
 
   constructor(private router: Router) {
-    // Escuchar cambios de ruta
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.updateActiveMenu(event.url);
@@ -30,67 +25,22 @@ export class SidebarComponent implements OnInit {
   }
 
   updateActiveMenu(url: string) {
-    if (url.includes('usuarios/crear')) {
-      this.activeMenu = 'usuarios/crear';
-      this.showUsuariosSubmenu = true;
-    } else if (url.includes('usuarios')) {
-      this.activeMenu = 'usuarios/lista';
-      this.showUsuariosSubmenu = true;
-    } else if (url.includes('pacientes/crear')) {
-      this.activeMenu = 'pacientes/crear';
-      this.showPacientesSubmenu = true;
+    if (url.includes('usuarios')) {
+      this.activeMenu = 'usuarios';
     } else if (url.includes('pacientes')) {
-      this.activeMenu = 'pacientes/lista';
-      this.showPacientesSubmenu = true;
-    } else if (url.includes('dashboard')) {
-      this.activeMenu = 'dashboard';
+      this.activeMenu = 'pacientes';
+    } else if (url.includes('camas')) {
+      this.activeMenu = 'camas';
+    } else if (url.includes('evaluacion')) {
+      this.activeMenu = 'evaluacion';
     }
-  }
-
-  toggleUsuarios() {
-    this.showUsuariosSubmenu = !this.showUsuariosSubmenu;
-  }
-
-  togglePacientes() {
-    this.showPacientesSubmenu = !this.showPacientesSubmenu;
-  }
-  
-  toggleCamas() {
-    this.showCamasSubmenu = !this.showCamasSubmenu;
-  }
-
-  toggleEvaluacion() {
-    this.showEvaluacionSubmenu = !this.showEvaluacionSubmenu;
   }
 
   navigateTo(route: string) {
+    // Navegar a /dashboard/ + la ruta
+    this.router.navigate([`/dashboard/${route}`]);
     this.activeMenu = route;
-    switch(route) {
-      case 'dashboard':
-        this.router.navigate(['/dashboard']);
-        break;
-      case 'usuarios/lista':
-        this.router.navigate(['/usuarios']);
-        break;
-      case 'usuarios/crear':
-        this.router.navigate(['/usuarios/crear']);
-        break;
-      case 'pacientes/lista':
-        this.router.navigate(['/pacientes']);
-        break;
-      case 'pacientes/crear':
-        this.router.navigate(['/pacientes/crear']);
-        break;
-      case 'camas/seleccion':
-        this.router.navigate(['/camas']);
-        break;
-      case 'evaluacion/calculadora':
-        this.router.navigate(['/evaluacion']);
-        break;
-    }
   }
-
-  
 
   logout() {
     localStorage.removeItem('usuario');
