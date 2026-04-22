@@ -452,3 +452,180 @@ class EvaluacionViewSet(viewsets.ModelViewSet):
             calculos[key] = ref
         
         return Response({'calculos': calculos})
+    
+
+# ==================== REQUERIMIENTO NUTRICIONAL ====================
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .models import RequerimientoNutricional, Medida
+from .serializers import RequerimientoNutricionalSerializer, RequerimientoNutricionalCreateSerializer
+
+class RequerimientoNutricionalViewSet(viewsets.ModelViewSet):
+    queryset = RequerimientoNutricional.objects.select_related('paciente', 'medida', 'registrado_por').all()
+    
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            return RequerimientoNutricionalCreateSerializer
+        return RequerimientoNutricionalSerializer
+    
+    @action(detail=False, methods=['GET'])
+    def por_paciente(self, request):
+        paciente_id = request.query_params.get('paciente_id')
+        if not paciente_id:
+            return Response({'error': 'Se requiere paciente_id'}, status=400)
+        
+        requerimientos = self.queryset.filter(paciente_id=paciente_id)
+        serializer = self.get_serializer(requerimientos, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['GET'])
+    def activo_por_paciente(self, request):
+        paciente_id = request.query_params.get('paciente_id')
+        if not paciente_id:
+            return Response({'error': 'Se requiere paciente_id'}, status=400)
+        
+        requerimiento = self.queryset.filter(paciente_id=paciente_id, estado='activo').first()
+        if requerimiento:
+            serializer = self.get_serializer(requerimiento)
+            return Response(serializer.data)
+        return Response({'message': 'No hay requerimiento activo'}, status=404)
+    
+    @action(detail=False, methods=['POST'])
+    def calcular_preview(self, request):
+        """Calcula los valores sin guardar (preview)"""
+        try:
+            peso_kg = float(request.data.get('peso_kg_at'))
+            talla_cm = float(request.data.get('talla_cm_at'))
+            factor_actividad = float(request.data.get('factor_actividad'))
+            factor_lesion = float(request.data.get('factor_lesion'))
+            
+            geb = RequerimientoNutricional.calcular_geb(peso_kg, talla_cm)
+            get = RequerimientoNutricional.calcular_get(geb, factor_actividad, factor_lesion)
+            kcal_por_kg = RequerimientoNutricional.calcular_kcal_por_kg(get, peso_kg)
+            
+            return Response({
+                'success': True,
+                'calculos': {
+                    'geb_kcal': round(geb, 2),
+                    'get_kcal': round(get, 2),
+                    'kcal_por_kg': round(kcal_por_kg, 2),
+                }
+            })
+        except Exception as e:
+            return Response({'success': False, 'error': str(e)}, status=500)
+    
+    @action(detail=False, methods=['GET'])
+    def ultima_medida(self, request):
+        paciente_id = request.query_params.get('paciente_id')
+        if not paciente_id:
+            return Response({'error': 'Se requiere paciente_id'}, status=400)
+        
+        medida = Medida.objects.filter(paciente_id=paciente_id).order_by('-fecha').first()
+        if medida:
+            return Response({
+                'success': True,
+                'medida': {
+                    'id': medida.id,
+                    'peso_kg': float(medida.peso_kg),
+                    'talla_cm': float(medida.talla_cm),
+                    'fecha': medida.fecha
+                }
+            })
+        return Response({'success': False, 'message': 'No hay medidas registradas'}, status=404)
+    
+# ==================== MOLÉCULA CALÓRICA ====================
+from rest_framework.decorators import action
+from .models import MoleculaCalorica, RequerimientoNutricional
+from .serializers import MoleculaCaloricaSerializer, MoleculaCaloricaCreateSerializer
+
+class MoleculaCaloricaViewSet(viewsets.ModelViewSet):
+    queryset = MoleculaCalorica.objects.select_related('paciente', 'requerimiento', 'medida', 'registrado_por').all()
+    
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            return MoleculaCaloricaCreateSerializer
+        return MoleculaCaloricaSerializer
+    
+    @action(detail=False, methods=['GET'])
+    def por_paciente(self, request):
+        paciente_id = request.query_params.get('paciente_id')
+        if not paciente_id:
+            return Response({'error': 'Se requiere paciente_id'}, status=400)
+        
+        moleculas = self.queryset.filter(paciente_id=paciente_id)
+        serializer = self.get_serializer(moleculas, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['GET'])
+    def activo_por_paciente(self, request):
+        paciente_id = request.query_params.get('paciente_id')
+        if not paciente_id:
+            return Response({'error': 'Se requiere paciente_id'}, status=400)
+        
+        molecula = self.queryset.filter(paciente_id=paciente_id, estado='activo').first()
+        if molecula:
+            serializer = self.get_serializer(molecula)
+            return Response(serializer.data)
+        return Response({'message': 'No hay molécula calórica activa'}, status=404)
+    
+    @action(detail=False, methods=['POST'])
+    def calcular_preview(self, request):
+        """Calcula los valores sin guardar (preview)"""
+        try:
+            peso_kg = float(request.data.get('peso_kg'))
+            kilocalorias_totales = float(request.data.get('kilocalorias_totales'))
+            proteinas_g_kg = float(request.data.get('proteinas_g_kg'))
+            porcentaje_grasas = float(request.data.get('porcentaje_grasas'))
+            
+            # Proteínas
+            proteinas_g = proteinas_g_kg * peso_kg
+            kcal_proteinas = proteinas_g * 4
+            porcentaje_proteina = kcal_proteinas / kilocalorias_totales if kilocalorias_totales > 0 else 0
+            
+            # Grasas
+            kcal_grasas = kilocalorias_totales * porcentaje_grasas
+            grasas_g = kcal_grasas / 9
+            porcentaje_grasas_calc = porcentaje_grasas
+            
+            # Carbohidratos
+            porcentaje_carbohidratos = 1 - (porcentaje_proteina + porcentaje_grasas_calc)
+            kcal_carbohidratos = kilocalorias_totales * porcentaje_carbohidratos
+            carbohidratos_g = kcal_carbohidratos / 4
+            
+            return Response({
+                'success': True,
+                'calculos': {
+                    'proteinas_g': round(proteinas_g, 2),
+                    'proteinas_g_kg': round(proteinas_g_kg, 2),
+                    'kilocalorias_proteinas': round(kcal_proteinas, 2),
+                    'porcentaje_proteinas': round(porcentaje_proteina * 100, 2),
+                    'grasas_g': round(grasas_g, 2),
+                    'kilocalorias_grasas': round(kcal_grasas, 2),
+                    'porcentaje_grasas': round(porcentaje_grasas_calc * 100, 2),
+                    'carbohidratos_g': round(carbohidratos_g, 2),
+                    'kilocalorias_carbohidratos': round(kcal_carbohidratos, 2),
+                    'porcentaje_carbohidratos': round(porcentaje_carbohidratos * 100, 2),
+                }
+            })
+        except Exception as e:
+            return Response({'success': False, 'error': str(e)}, status=500)
+    
+    @action(detail=False, methods=['GET'])
+    def datos_requerimiento_activo(self, request):
+        paciente_id = request.query_params.get('paciente_id')
+        if not paciente_id:
+            return Response({'error': 'Se requiere paciente_id'}, status=400)
+        
+        requerimiento = RequerimientoNutricional.objects.filter(
+            paciente_id=paciente_id, 
+            estado='activo'
+        ).first()
+        
+        if requerimiento:
+            return Response({
+                'success': True,
+                'requerimiento_id': requerimiento.id,
+                'kilocalorias_totales': requerimiento.get_kcal
+            })
+        return Response({'success': False, 'message': 'No hay requerimiento activo'}, status=404)

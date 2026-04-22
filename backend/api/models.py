@@ -372,3 +372,160 @@ class Evaluacion(models.Model):
     def __str__(self):
         return f"Evaluación {self.id} - Medida {self.medida_id}"
     
+
+# ==================== REQUERIMIENTO NUTRICIONAL ====================
+class RequerimientoNutricional(models.Model):
+    ESTADO_CHOICES = [
+        ('activo', 'Activo'),
+        ('inactivo', 'Inactivo'),
+    ]
+    
+    paciente = models.ForeignKey('Paciente', on_delete=models.CASCADE, related_name='requerimientos_nutricionales')
+    medida = models.ForeignKey('Medida', on_delete=models.SET_NULL, null=True, blank=True, related_name='requerimientos_nutricionales')
+    
+    peso_kg_at = models.DecimalField(max_digits=6, decimal_places=2)
+    talla_cm_at = models.DecimalField(max_digits=5, decimal_places=2)
+    
+    geb_kcal = models.DecimalField(max_digits=8, decimal_places=2)
+    factor_actividad = models.DecimalField(max_digits=4, decimal_places=2)
+    factor_lesion = models.DecimalField(max_digits=4, decimal_places=2)
+    get_kcal = models.DecimalField(max_digits=8, decimal_places=2)
+    kcal_por_kg = models.DecimalField(max_digits=6, decimal_places=2)
+    
+    registrado_por = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True, related_name='requerimientos_nutricionales')
+    estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='activo')
+    calculado_en = models.DateTimeField(auto_now_add=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'requerimientos_nutricionales'
+        verbose_name = 'Requerimiento Nutricional'
+        verbose_name_plural = 'Requerimientos Nutricionales'
+        indexes = [
+            models.Index(fields=['paciente']),
+            models.Index(fields=['estado']),
+        ]
+    
+    def __str__(self):
+        return f"Req. Nutricional - {self.paciente} - {self.get_kcal} kcal"
+    
+    @classmethod
+    def calcular_geb(cls, peso, talla):
+        """Fórmula: (0.035 * peso) + (1.9484 * talla) + 837"""
+        return (0.035 * peso) + (1.9484 * talla) + 837
+    
+    @classmethod
+    def calcular_get(cls, geb, factor_actividad, factor_lesion):
+        return geb * factor_actividad * factor_lesion
+    
+    @classmethod
+    def calcular_kcal_por_kg(cls, get, peso):
+        return get / peso if peso > 0 else 0
+    
+
+# ==================== MOLÉCULA CALÓRICA ====================
+class MoleculaCalorica(models.Model):
+    ESTADO_CHOICES = [
+        ('activo', 'Activo'),
+        ('inactivo', 'Inactivo'),
+    ]
+    
+    paciente = models.ForeignKey('Paciente', on_delete=models.CASCADE, related_name='moleculas_caloricas')
+    medida = models.ForeignKey('Medida', on_delete=models.SET_NULL, null=True, blank=True, related_name='moleculas_caloricas')
+    requerimiento = models.ForeignKey('RequerimientoNutricional', on_delete=models.SET_NULL, null=True, blank=True, related_name='moleculas_caloricas')
+    
+    peso_kg = models.DecimalField(max_digits=6, decimal_places=2)
+    talla_cm = models.DecimalField(max_digits=5, decimal_places=2)
+    kilocalorias_totales = models.DecimalField(max_digits=8, decimal_places=2)
+    
+    # Datos manuales
+    proteinas_g_kg = models.DecimalField(max_digits=5, decimal_places=2)
+    porcentaje_grasas = models.DecimalField(max_digits=5, decimal_places=4)
+    
+    # Resultados calculados
+    grasas_g_kg = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    carbohidratos_g_kg = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    
+    kilocalorias_proteinas = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    kilocalorias_grasas = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    kilocalorias_carbohidratos = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    
+    porcentaje_proteinas = models.DecimalField(max_digits=5, decimal_places=4, null=True, blank=True)
+    porcentaje_carbohidratos = models.DecimalField(max_digits=5, decimal_places=4, null=True, blank=True)
+    
+    registrado_por = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True, related_name='moleculas_caloricas')
+    estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='activo')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'molecula_calorica'
+        verbose_name = 'Molécula Calórica'
+        verbose_name_plural = 'Moléculas Calóricas'
+        indexes = [
+            models.Index(fields=['paciente']),
+            models.Index(fields=['requerimiento']),
+            models.Index(fields=['estado']),
+        ]
+    
+    def __str__(self):
+        return f"Molécula Calórica - {self.paciente} - {self.created_at.strftime('%d/%m/%Y')}"
+    
+    def calcular_molecula_calorica(self, proteinas_g_kg, porcentaje_grasas):
+        """
+        Calcula toda la molécula calórica según las fórmulas
+        """
+        peso = float(self.peso_kg)
+        kcal_totales = float(self.kilocalorias_totales)
+        
+        # 1. Proteínas (gramos)
+        proteinas_g = proteinas_g_kg * peso
+        
+        # 2. Kilocalorías de proteínas
+        kcal_proteinas = proteinas_g * 4
+        
+        # 3. Porcentaje de proteínas
+        porcentaje_proteina = kcal_proteinas / kcal_totales if kcal_totales > 0 else 0
+        
+        # 4. Kilocalorías de grasa
+        kcal_grasas = kcal_totales * porcentaje_grasas
+        
+        # 5. Gramos de grasa
+        grasas_g = kcal_grasas / 9
+        
+        # 6. Porcentaje de carbohidratos
+        porcentaje_carbohidratos = 1 - (porcentaje_proteina + porcentaje_grasas)
+        
+        # 7. Kilocalorías de carbohidratos
+        kcal_carbohidratos = kcal_totales * porcentaje_carbohidratos
+        
+        # 8. Gramos de carbohidratos
+        carbohidratos_g = kcal_carbohidratos / 4
+        
+        # Asignar valores
+        self.proteinas_g_kg = round(proteinas_g_kg, 2)
+        self.porcentaje_grasas = round(porcentaje_grasas, 4)
+        self.kilocalorias_proteinas = round(kcal_proteinas, 2)
+        self.kilocalorias_grasas = round(kcal_grasas, 2)
+        self.kilocalorias_carbohidratos = round(kcal_carbohidratos, 2)
+        self.porcentaje_proteinas = round(porcentaje_proteina, 4)
+        self.porcentaje_carbohidratos = round(porcentaje_carbohidratos, 4)
+        
+        # Valores por kg de peso
+        self.grasas_g_kg = round(grasas_g / peso, 2) if peso > 0 else 0
+        self.carbohidratos_g_kg = round(carbohidratos_g / peso, 2) if peso > 0 else 0
+    
+    @property
+    def proteinas_g(self):
+        return float(self.proteinas_g_kg) * float(self.peso_kg) if self.peso_kg else 0
+    
+    @property
+    def grasas_g(self):
+        return float(self.kilocalorias_grasas) / 9 if self.kilocalorias_grasas else 0
+    
+    @property
+    def carbohidratos_g(self):
+        return float(self.kilocalorias_carbohidratos) / 4 if self.kilocalorias_carbohidratos else 0

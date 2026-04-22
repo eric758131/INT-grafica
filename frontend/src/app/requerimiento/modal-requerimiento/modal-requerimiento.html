@@ -1,0 +1,140 @@
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" (click)="cerrar()">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="sticky top-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-5 rounded-t-2xl">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">📊</span>
+          <h2 class="text-xl font-bold">Calcular Requerimiento Nutricional</h2>
+        </div>
+        <button (click)="cerrar()" class="hover:bg-white/20 rounded-lg p-2 transition">✕</button>
+      </div>
+      <p class="text-sm text-white/80 mt-1">Complete los datos para calcular el requerimiento</p>
+    </div>
+
+    <!-- Body -->
+    <div class="p-6">
+      <!-- Info Paciente -->
+      <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-4 text-white mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-xl">👤</div>
+          <div>
+            <h3 class="font-bold">{{ paciente?.nombre }} {{ paciente?.apellido_paterno }}</h3>
+            <p class="text-sm opacity-90">CI: {{ paciente?.ci }} | Edad: {{ calcularEdad(paciente?.fecha_nacimiento || '') }} años</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Última Medida -->
+      @if (ultimaMedida) {
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm font-semibold text-blue-800">📏 Última Medida Registrada</p>
+              <p class="text-sm text-blue-700">Fecha: {{ ultimaMedida.fecha | date:'dd/MM/yyyy' }} | Peso: {{ ultimaMedida.peso_kg }} kg | Talla: {{ ultimaMedida.talla_cm }} cm</p>
+              <p class="text-xs text-blue-600 mt-1">✅ Valores precargados (no modificables)</p>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (!ultimaMedida) {
+        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+          <p class="text-sm text-yellow-800">⚠️ No hay medidas previas registradas. Ingrese los datos manualmente.</p>
+        </div>
+      }
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Datos Antropométricos -->
+        <div class="bg-gray-50 rounded-xl p-4">
+          <h3 class="font-bold text-gray-700 mb-4">📏 Datos Antropométricos</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Peso (kg) *</label>
+              <input type="number" step="0.01" 
+                [value]="datos.peso_kg_at" 
+                [disabled]="!!ultimaMedida"
+                (input)="actualizarPeso($event)"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                [class.bg-gray-100]="ultimaMedida">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Talla (cm) *</label>
+              <input type="number" step="0.1" 
+                [value]="datos.talla_cm_at" 
+                [disabled]="!!ultimaMedida"
+                (input)="actualizarTalla($event)"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                [class.bg-gray-100]="ultimaMedida">
+            </div>
+          </div>
+        </div>
+
+        <!-- Factores -->
+        <div class="bg-gray-50 rounded-xl p-4">
+          <h3 class="font-bold text-gray-700 mb-4">⚙️ Factores de Cálculo</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Factor de Actividad *</label>
+              <select [(ngModel)]="datos.factor_actividad" (change)="calcularPreview()"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">Seleccione</option>
+                <option value="1.2">1.2 - Reposo en cama</option>
+                <option value="1.3">1.3 - Actividad leve</option>
+                <option value="1.5">1.5 - Actividad moderada</option>
+                <option value="1.7">1.7 - Actividad intensa</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Factor de Lesión *</label>
+              <select [(ngModel)]="datos.factor_lesion" (change)="calcularPreview()"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">Seleccione</option>
+                <option value="1.0">1.0 - Sin lesión</option>
+                <option value="1.2">1.2 - Cirugía menor</option>
+                <option value="1.3">1.3 - Fractura</option>
+                <option value="1.5">1.5 - Sepsis</option>
+                <option value="1.6">1.6 - Trauma múltiple</option>
+                <option value="1.8">1.8 - Quemaduras graves</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resultados -->
+      <div class="mt-6">
+        <h3 class="font-bold text-gray-700 mb-3">📈 Resultados del Cálculo</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 text-white text-center">
+            <p class="text-sm opacity-90">GEB</p>
+            <p class="text-3xl font-bold">{{ previewResults.geb_kcal || 0 }}</p>
+            <p class="text-xs">kcal/día</p>
+          </div>
+          <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-4 text-white text-center">
+            <p class="text-sm opacity-90">GET</p>
+            <p class="text-3xl font-bold">{{ previewResults.get_kcal || 0 }}</p>
+            <p class="text-xs">kcal/día</p>
+          </div>
+          <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-4 text-white text-center">
+            <p class="text-sm opacity-90">Kcal/kg</p>
+            <p class="text-3xl font-bold">{{ previewResults.kcal_por_kg || 0 }}</p>
+            <p class="text-xs">kcal por kg</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+        <button (click)="cerrar()" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+          Cancelar
+        </button>
+        <button (click)="guardar()" [disabled]="calculando || !formularioValido()"
+          class="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:scale-105 transition disabled:opacity-50">
+          {{ calculando ? 'Calculando...' : '💾 Calcular y Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

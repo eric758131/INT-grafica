@@ -33,6 +33,10 @@ export class SidebarComponent implements OnInit {
       this.activeMenu = 'camas';
     } else if (url.includes('evaluacion')) {
       this.activeMenu = 'evaluacion';
+    } else if (url.includes('requerimiento')) {
+      this.activeMenu = 'requerimiento';
+    } else if (url.includes('molecula')) {
+      this.activeMenu = 'molecula';
     }
   }
 

@@ -30,6 +30,8 @@ router.register(r'oms-ref', views.OmsRefViewSet)
 router.register(r'frisancho-ref', views.FrisanchoRefViewSet)
 router.register(r'medidas', views.MedidaViewSet, basename='medida')
 router.register(r'evaluaciones', views.EvaluacionViewSet)
+router.register(r'requerimiento-nutricional', views.RequerimientoNutricionalViewSet)
+router.register(r'molecula-calorica', views.MoleculaCaloricaViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

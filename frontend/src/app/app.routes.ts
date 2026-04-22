@@ -6,7 +6,10 @@ import { ListaPacientesComponent } from './pacientes/lista-pacientes/lista-pacie
 import { SeleccionCamasComponent } from './camas/seleccion-camas/seleccion-camas';
 import { ListaEvaluacionesComponent } from './evaluacion/lista-evaluaciones/lista-evaluaciones';
 import { FormularioEvaluacionComponent } from './evaluacion/formulario-evaluacion/formulario-evaluacion';
+import { ListaRequerimientosComponent } from './requerimiento/lista-requerimientos/lista-requerimientos';
+import { ListaMoleculaComponent } from './molecula/lista-molecula/lista-molecula';
 import { AuthGuard } from './guards/auth.guard';
+
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -20,7 +23,9 @@ export const routes: Routes = [
       { path: 'camas', component: SeleccionCamasComponent },
       { path: 'evaluacion', component: ListaEvaluacionesComponent },
       { path: 'evaluacion/nueva/:pacienteId', component: FormularioEvaluacionComponent },
-      { path: '', redirectTo: 'evaluacion', pathMatch: 'full' }
+      { path: '', redirectTo: 'evaluacion', pathMatch: 'full' },
+      { path: 'requerimiento', component: ListaRequerimientosComponent },
+      { path: 'molecula', component: ListaMoleculaComponent },
     ]
   },
   { path: '', redirectTo: '/login', pathMatch: 'full' },

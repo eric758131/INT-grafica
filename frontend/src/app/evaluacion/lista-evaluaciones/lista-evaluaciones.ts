@@ -98,9 +98,11 @@ export class ListaEvaluacionesComponent implements OnInit {
   }
 
   verResultados(evaluacion: Evaluacion) {
-    this.zone.run(() => {
-      this.router.navigate(['/evaluacion/resultados', evaluacion.id]);
-    });
+    this.router.navigate(['/dashboard/evaluacion/resultados', evaluacion.id]);
+  }
+
+  verCalculos(evaluacion: Evaluacion) {
+    this.router.navigate(['/dashboard/evaluacion/calculos', evaluacion.id]);
   }
 
   volver() {

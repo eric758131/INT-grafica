@@ -42,6 +42,25 @@
           <span>Evaluaciones</span>
         </a>
       </li>
+
+      <li>
+        <a (click)="navigateTo('requerimiento')" 
+          class="flex items-center px-4 py-3 cursor-pointer transition-all duration-300 rounded-xl font-semibold"
+          [class.bg-white/25]="activeMenu === 'requerimiento'">
+          <span class="material-icons mr-3 text-2xl">restaurant</span>
+          <span>Requerimiento</span>
+        </a>
+      </li>
+
+      <li>
+        <a (click)="navigateTo('molecula')" 
+          class="flex items-center px-4 py-3 cursor-pointer transition-all duration-300 rounded-xl font-semibold"
+          [class.bg-white/25]="activeMenu === 'molecula'">
+          <span class="material-icons mr-3 text-2xl">science</span>
+          <span>Molécula Calórica</span>
+        </a>
+      </li>
+
     </ul>
   </nav>
 

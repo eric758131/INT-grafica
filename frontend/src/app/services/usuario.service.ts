@@ -150,6 +150,55 @@ export interface CalculosResponse {
   };
 }
 
+// ========== REQUERIMIENTO NUTRICIONAL ==========
+export interface RequerimientoNutricional {
+  id?: number;
+  paciente: number;
+  paciente_nombre?: string;
+  paciente_apellido?: string;
+  paciente_ci?: string;
+  medida?: number | null;
+  peso_kg_at: number;
+  talla_cm_at: number;
+  geb_kcal: number;
+  factor_actividad: number;
+  factor_lesion: number;
+  get_kcal: number;
+  kcal_por_kg: number;
+  estado: string;
+  registrado_por?: number;
+  registrado_por_nombre?: string;
+  calculado_en?: string;
+  created_at?: string;
+}
+
+// ========== MOLÉCULA CALÓRICA ==========
+export interface MoleculaCalorica {
+  id?: number;
+  paciente: number;
+  paciente_nombre?: string;
+  paciente_apellido?: string;
+  medida?: number | null;
+  requerimiento?: number | null;
+  requerimiento_get?: number;
+  peso_kg: number;
+  talla_cm: number;
+  kilocalorias_totales: number;
+  proteinas_g_kg: number;
+  porcentaje_grasas: number;
+  grasas_g_kg?: number;
+  carbohidratos_g_kg?: number;
+  kilocalorias_proteinas?: number;
+  kilocalorias_grasas?: number;
+  kilocalorias_carbohidratos?: number;
+  porcentaje_proteinas?: number;
+  porcentaje_carbohidratos?: number;
+  registrado_por?: number;
+  registrado_por_nombre?: string;
+  estado: string;
+  created_at?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -254,5 +303,72 @@ export class UsuarioService {
 
   getEvaluacionById(id: number): Observable<Evaluacion> {
     return this.http.get<Evaluacion>(`${this.apiUrl}/evaluaciones/${id}/`);
+  }
+
+  // Métodos en UsuarioService
+  getRequerimientos(): Observable<RequerimientoNutricional[]> {
+    return this.http.get<RequerimientoNutricional[]>(`${this.apiUrl}/requerimiento-nutricional/`);
+  }
+
+  getRequerimientosPorPaciente(pacienteId: number): Observable<RequerimientoNutricional[]> {
+    return this.http.get<RequerimientoNutricional[]>(`${this.apiUrl}/requerimiento-nutricional/por_paciente/?paciente_id=${pacienteId}`);
+  }
+
+  getRequerimientoActivoPorPaciente(pacienteId: number): Observable<RequerimientoNutricional> {
+    return this.http.get<RequerimientoNutricional>(`${this.apiUrl}/requerimiento-nutricional/activo_por_paciente/?paciente_id=${pacienteId}`);
+  }
+
+  calcularPreviewRequerimiento(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/requerimiento-nutricional/calcular_preview/`, data);
+  }
+
+  getUltimaMedida(pacienteId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/requerimiento-nutricional/ultima_medida/?paciente_id=${pacienteId}`);
+  }
+
+  createRequerimiento(data: any): Observable<RequerimientoNutricional> {
+    return this.http.post<RequerimientoNutricional>(`${this.apiUrl}/requerimiento-nutricional/`, data);
+  }
+
+  updateRequerimiento(id: number, data: any): Observable<RequerimientoNutricional> {
+    return this.http.put<RequerimientoNutricional>(`${this.apiUrl}/requerimiento-nutricional/${id}/`, data);
+  }
+
+  deleteRequerimiento(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/requerimiento-nutricional/${id}/`);
+  }
+
+
+  // Métodos en UsuarioService
+  getMoleculas(): Observable<MoleculaCalorica[]> {
+    return this.http.get<MoleculaCalorica[]>(`${this.apiUrl}/molecula-calorica/`);
+  }
+
+  getMoleculasPorPaciente(pacienteId: number): Observable<MoleculaCalorica[]> {
+    return this.http.get<MoleculaCalorica[]>(`${this.apiUrl}/molecula-calorica/por_paciente/?paciente_id=${pacienteId}`);
+  }
+
+  getMoleculaActivaPorPaciente(pacienteId: number): Observable<MoleculaCalorica> {
+    return this.http.get<MoleculaCalorica>(`${this.apiUrl}/molecula-calorica/activo_por_paciente/?paciente_id=${pacienteId}`);
+  }
+
+  calcularPreviewMolecula(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/molecula-calorica/calcular_preview/`, data);
+  }
+
+  getDatosRequerimientoActivo(pacienteId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/molecula-calorica/datos_requerimiento_activo/?paciente_id=${pacienteId}`);
+  }
+
+  createMolecula(data: any): Observable<MoleculaCalorica> {
+    return this.http.post<MoleculaCalorica>(`${this.apiUrl}/molecula-calorica/`, data);
+  }
+
+  updateMolecula(id: number, data: any): Observable<MoleculaCalorica> {
+    return this.http.put<MoleculaCalorica>(`${this.apiUrl}/molecula-calorica/${id}/`, data);
+  }
+
+  deleteMolecula(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/molecula-calorica/${id}/`);
   }
 }

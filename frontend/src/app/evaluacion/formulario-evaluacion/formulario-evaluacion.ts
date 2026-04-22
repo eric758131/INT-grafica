@@ -165,19 +165,21 @@ export class FormularioEvaluacionComponent implements OnInit {
             icon: 'success',
             confirmButtonColor: '#3085d6'
           }).then(() => {
-            this.router.navigate(['/evaluacion']);
+            // Redirigir a la lista de evaluaciones dentro del dashboard
+            this.router.navigate(['/dashboard/evaluacion']);
           });
         } else {
           Swal.fire('Error', response?.error || 'Error al guardar', 'error');
         }
       },
-      error: () => {
+      error: (error) => {
+        console.error('Error al guardar:', error);
         Swal.fire('Error', 'Error de conexión con el servidor', 'error');
       }
     });
   }
 
   volver() {
-    this.router.navigate(['/evaluacion']);
+    this.router.navigate(['/dashboard/evaluacion']);
   }
 }

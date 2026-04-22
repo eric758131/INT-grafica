@@ -1,7 +1,10 @@
+from datetime import timezone
+
 from rest_framework import serializers
 from .models import User, Tutor, Paciente
 from .models import Cama, Paciente
-from .models import OmsRef, FrisanchoRef, Medida, Evaluacion
+from .models import OmsRef, FrisanchoRef, Medida, Evaluacion, MoleculaCalorica, RequerimientoNutricional
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -137,3 +140,110 @@ class EvaluacionDetalleSerializer(serializers.ModelSerializer):
         model = Evaluacion
         fields = '__all__'
         read_only_fields = ['created_at', 'updated_at']
+
+# ==================== REQUERIMIENTO NUTRICIONAL ====================
+class RequerimientoNutricionalSerializer(serializers.ModelSerializer):
+    paciente_nombre = serializers.CharField(source='paciente.nombre', read_only=True)
+    paciente_apellido = serializers.CharField(source='paciente.apellido_paterno', read_only=True)
+    paciente_ci = serializers.CharField(source='paciente.ci', read_only=True)
+    registrado_por_nombre = serializers.CharField(source='registrado_por.nombre', read_only=True)
+    
+    class Meta:
+        model = RequerimientoNutricional
+        fields = '__all__'
+        read_only_fields = ['created_at', 'updated_at', 'calculado_en']
+
+
+class RequerimientoNutricionalCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RequerimientoNutricional
+        fields = ['paciente', 'medida', 'peso_kg_at', 'talla_cm_at', 
+                  'factor_actividad', 'factor_lesion', 'estado']
+    
+    def create(self, validated_data):
+        # Calcular valores automáticamente
+        peso = float(validated_data['peso_kg_at'])
+        talla = float(validated_data['talla_cm_at'])
+        factor_actividad = float(validated_data['factor_actividad'])
+        factor_lesion = float(validated_data['factor_lesion'])
+        
+        geb = RequerimientoNutricional.calcular_geb(peso, talla)
+        get = RequerimientoNutricional.calcular_get(geb, factor_actividad, factor_lesion)
+        kcal_por_kg = RequerimientoNutricional.calcular_kcal_por_kg(get, peso)
+        
+        request = self.context.get('request')
+        
+        requerimiento = RequerimientoNutricional.objects.create(
+            **validated_data,
+            geb_kcal=round(geb, 2),
+            get_kcal=round(get, 2),
+            kcal_por_kg=round(kcal_por_kg, 2),
+            registrado_por=request.user if request and request.user.is_authenticated else None
+        )
+        return requerimiento
+    
+    def update(self, instance, validated_data):
+        # Actualizar campos
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        
+        # Recalcular valores
+        peso = float(instance.peso_kg_at)
+        talla = float(instance.talla_cm_at)
+        factor_actividad = float(instance.factor_actividad)
+        factor_lesion = float(instance.factor_lesion)
+        
+        geb = RequerimientoNutricional.calcular_geb(peso, talla)
+        get = RequerimientoNutricional.calcular_get(geb, factor_actividad, factor_lesion)
+        kcal_por_kg = RequerimientoNutricional.calcular_kcal_por_kg(get, peso)
+        
+        instance.geb_kcal = round(geb, 2)
+        instance.get_kcal = round(get, 2)
+        instance.kcal_por_kg = round(kcal_por_kg, 2)
+        instance.calculado_en = timezone.now()
+        
+        instance.save()
+        return instance
+    
+# ==================== MOLÉCULA CALÓRICA ====================
+class MoleculaCaloricaSerializer(serializers.ModelSerializer):
+    paciente_nombre = serializers.CharField(source='paciente.nombre', read_only=True)
+    paciente_apellido = serializers.CharField(source='paciente.apellido_paterno', read_only=True)
+    requerimiento_get = serializers.CharField(source='requerimiento.get_kcal', read_only=True)
+    registrado_por_nombre = serializers.CharField(source='registrado_por.nombre', read_only=True)
+    
+    class Meta:
+        model = MoleculaCalorica
+        fields = '__all__'
+        read_only_fields = ['created_at', 'updated_at']
+
+
+class MoleculaCaloricaCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MoleculaCalorica
+        fields = ['paciente', 'medida', 'requerimiento', 'peso_kg', 'talla_cm', 
+                  'kilocalorias_totales', 'proteinas_g_kg', 'porcentaje_grasas', 'estado']
+    
+    def create(self, validated_data):
+        request = self.context.get('request')
+        molecula = MoleculaCalorica.objects.create(
+            **validated_data,
+            registrado_por=request.user if request and request.user.is_authenticated else None
+        )
+        molecula.calcular_molecula_calorica(
+            float(validated_data['proteinas_g_kg']),
+            float(validated_data['porcentaje_grasas'])
+        )
+        molecula.save()
+        return molecula
+    
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        
+        instance.calcular_molecula_calorica(
+            float(instance.proteinas_g_kg),
+            float(instance.porcentaje_grasas)
+        )
+        instance.save()
+        return instance
