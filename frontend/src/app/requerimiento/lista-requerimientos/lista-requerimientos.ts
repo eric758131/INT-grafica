@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UsuarioService, Paciente, RequerimientoNutricional } from '../../services/usuario.service';
 import { ModalRequerimientoComponent } from '../modal-requerimiento/modal-requerimiento';
+import { ModalGraficoRequerimientoComponent } from '../modal-grafico-requerimiento/modal-grafico-requerimiento';   // ← NUEVO
 
 export interface PacienteConEdad extends Paciente {
   edad: number;
@@ -11,17 +12,27 @@ export interface PacienteConEdad extends Paciente {
 @Component({
   selector: 'app-lista-requerimientos',
   standalone: true,
-  imports: [CommonModule, FormsModule, ModalRequerimientoComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ModalRequerimientoComponent,
+    ModalGraficoRequerimientoComponent,   // ← NUEVO
+  ],
   templateUrl: './lista-requerimientos.html',
   styleUrls: ['./lista-requerimientos.css']
 })
 export class ListaRequerimientosComponent implements OnInit {
+
   pacientes: PacienteConEdad[] = [];
   requerimientos: RequerimientoNutricional[] = [];
   pacienteSeleccionado: PacienteConEdad | null = null;
   loading = true;
   searchTerm = '';
   mostrarModal = false;
+
+  // ── NUEVO: modal 3D ──────────────────────────────────────────
+  mostrarGrafico3d = false;
+  requerimientoSeleccionado: RequerimientoNutricional | null = null;
 
   constructor(
     private service: UsuarioService,
@@ -58,16 +69,14 @@ export class ListaRequerimientosComponent implements OnInit {
     const nac = new Date(fechaNacimiento);
     let edad = hoy.getFullYear() - nac.getFullYear();
     const m = hoy.getMonth() - nac.getMonth();
-    if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) {
-      edad--;
-    }
+    if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad--;
     return edad > 0 ? edad : 0;
   }
 
   get pacientesFiltrados(): PacienteConEdad[] {
     if (!this.searchTerm) return this.pacientes;
     const term = this.searchTerm.toLowerCase();
-    return this.pacientes.filter(p => 
+    return this.pacientes.filter(p =>
       p.nombre.toLowerCase().includes(term) ||
       p.apellido_paterno.toLowerCase().includes(term) ||
       p.ci.includes(term)
@@ -115,17 +124,15 @@ export class ListaRequerimientosComponent implements OnInit {
     }
   }
 
+  // ── NUEVO: abrir / cerrar gráfico 3D ─────────────────────────
   verDetalle(req: RequerimientoNutricional) {
-    alert(`📊 DETALLE REQUERIMIENTO\n\n` +
-      `GEB: ${req.geb_kcal} kcal/día\n` +
-      `GET: ${req.get_kcal} kcal/día\n` +
-      `Kcal/kg: ${req.kcal_por_kg}\n` +
-      `Peso: ${req.peso_kg_at} kg\n` +
-      `Talla: ${req.talla_cm_at} cm\n` +
-      `Factor Actividad: ${req.factor_actividad}\n` +
-      `Factor Lesión: ${req.factor_lesion}\n` +
-      `Registrado por: ${req.registrado_por_nombre || 'N/A'}\n` +
-      `Fecha: ${new Date(req.calculado_en!).toLocaleString()}`);
+    this.requerimientoSeleccionado = req;
+    this.mostrarGrafico3d = true;
+  }
+
+  cerrarGrafico3d() {
+    this.mostrarGrafico3d = false;
+    this.requerimientoSeleccionado = null;
   }
 
   cambiarEstado(req: RequerimientoNutricional) {

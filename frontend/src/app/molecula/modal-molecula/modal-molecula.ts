@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UsuarioService, Paciente } from '../../services/usuario.service';
 import Swal from 'sweetalert2';
+import { ModalGrafico3dComponent } from '../modal-grafico-3d/modal-grafico-3d';
 
 @Component({
   selector: 'app-modal-molecula',

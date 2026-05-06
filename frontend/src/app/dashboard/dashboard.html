@@ -1,18 +1,16 @@
-<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative">
+  
+  <!-- Canvas para Three.js -->
+  <div #canvasContainer class="fixed inset-0 z-0 pointer-events-none"></div>
+  
   <!-- Sidebar fijo -->
   <app-sidebar></app-sidebar>
 
-  <!-- Contenido principal con margen izquierdo para la sidebar fija -->
-  <div class="ml-64 min-h-screen relative">
+  <!-- Contenido principal con margen izquierdo -->
+  <div class="ml-64 min-h-screen relative z-10">
     
-    <!-- Decoración de fondo -->
+    <!-- Decoración de fondo adicional (opcional, puedes quitarla si prefieres solo Three.js) -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
-      <div class="absolute top-20 -left-20 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-      <div class="absolute top-40 -right-20 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-      <div class="absolute bottom-20 left-1/2 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
-      <div class="absolute bottom-40 right-20 w-64 h-64 bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-slow"></div>
-      
-      <!-- Patrón de puntos -->
       <svg class="absolute inset-0 w-full h-full opacity-5" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <pattern id="dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -24,7 +22,7 @@
     </div>
 
     <!-- Header mejorado -->
-    <header class="relative z-10 bg-white/80 backdrop-blur-md shadow-lg p-4 flex justify-between items-center sticky top-0 border-b border-white/20">
+    <header class="relative bg-white/80 backdrop-blur-md shadow-lg p-4 flex justify-between items-center sticky top-0 border-b border-white/20 z-20">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
           <span class="text-white text-xl">📊</span>

@@ -1,0 +1,90 @@
+<div class="modal-overlay" (click)="cerrar()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-left">
+        <span class="header-icon">📊</span>
+        <div>
+          <h2 class="modal-title">Requerimiento Nutricional 3D</h2>
+          <p class="modal-subtitle">{{ fechaFormateada }}</p>
+        </div>
+      </div>
+      <button class="btn-close" (click)="cerrar()">✕</button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+
+      <!-- Canvas Three.js -->
+      <div class="canvas-wrapper">
+        <canvas #threeCanvas class="three-canvas"></canvas>
+        <div class="canvas-hint">Arrastra para rotar · Rueda para zoom</div>
+      </div>
+
+      <!-- Panel de datos -->
+      <div class="info-panel">
+
+        <!-- GEB -->
+        <div class="valor-card" style="--accent: #3b82f6">
+          <div class="valor-dot" style="background:#3b82f6"></div>
+          <div class="valor-info">
+            <span class="valor-label">GEB</span>
+            <span class="valor-num">{{ +(req.geb_kcal || 0) | number:'1.0-0' }}</span>
+            <span class="valor-unit">kcal/día</span>
+            <span class="valor-desc">Gasto Energético Basal</span>
+          </div>
+        </div>
+
+        <!-- GET -->
+        <div class="valor-card" style="--accent: #10b981">
+          <div class="valor-dot" style="background:#10b981"></div>
+          <div class="valor-info">
+            <span class="valor-label">GET</span>
+            <span class="valor-num">{{ +(req.get_kcal || 0) | number:'1.0-0' }}</span>
+            <span class="valor-unit">kcal/día</span>
+            <span class="valor-desc">Gasto Energético Total</span>
+          </div>
+        </div>
+
+        <!-- Kcal/kg -->
+        <div class="valor-card" style="--accent: #8b5cf6">
+          <div class="valor-dot" style="background:#8b5cf6"></div>
+          <div class="valor-info">
+            <span class="valor-label">Kcal/kg</span>
+            <span class="valor-num">{{ +(req.kcal_por_kg || 0) | number:'1.1-1' }}</span>
+            <span class="valor-unit">kcal por kg</span>
+            <span class="valor-desc">Densidad calórica</span>
+          </div>
+        </div>
+
+        <!-- Datos clínicos -->
+        <div class="datos-box">
+          <div class="dato-row">
+            <span class="dato-label">Peso</span>
+            <span class="dato-val">{{ req.peso_kg_at }} kg</span>
+          </div>
+          <div class="dato-row">
+            <span class="dato-label">Talla</span>
+            <span class="dato-val">{{ req.talla_cm_at }} cm</span>
+          </div>
+          <div class="dato-row">
+            <span class="dato-label">F. Actividad</span>
+            <span class="dato-val">{{ req.factor_actividad }}</span>
+          </div>
+          <div class="dato-row">
+            <span class="dato-label">F. Lesión</span>
+            <span class="dato-val">{{ req.factor_lesion }}</span>
+          </div>
+          <div class="dato-row">
+            <span class="dato-label">Estado</span>
+            <span class="dato-badge" [class.activo]="req.estado === 'activo'">{{ req.estado }}</span>
+          </div>
+         
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

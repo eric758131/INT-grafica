@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UsuarioService, Paciente, MoleculaCalorica } from '../../services/usuario.service';
 import { ModalMoleculaComponent } from '../modal-molecula/modal-molecula';
+import { ModalGrafico3dComponent } from '../modal-grafico-3d/modal-grafico-3d';   // ← NUEVO
 
 
 export interface PacienteConEdad extends Paciente {
@@ -12,7 +13,7 @@ export interface PacienteConEdad extends Paciente {
 @Component({
   selector: 'app-lista-molecula',
   standalone: true,
-  imports: [CommonModule, FormsModule, ModalMoleculaComponent],
+  imports: [CommonModule, FormsModule, ModalMoleculaComponent, ModalGrafico3dComponent], // ← NUEVO
   templateUrl: './lista-molecula.html',
   styleUrls: ['./lista-molecula.css']
 })
@@ -23,6 +24,10 @@ export class ListaMoleculaComponent implements OnInit {
   loading = true;
   searchTerm = '';
   mostrarModal = false;
+
+  // ── NUEVO: estado del modal 3D ──────────────────────────────
+  mostrarGrafico3d = false;
+  moleculaSeleccionada: MoleculaCalorica | null = null;
 
   constructor(
     private service: UsuarioService,
@@ -68,7 +73,7 @@ export class ListaMoleculaComponent implements OnInit {
   get pacientesFiltrados(): PacienteConEdad[] {
     if (!this.searchTerm) return this.pacientes;
     const term = this.searchTerm.toLowerCase();
-    return this.pacientes.filter(p => 
+    return this.pacientes.filter(p =>
       p.nombre.toLowerCase().includes(term) ||
       p.apellido_paterno.toLowerCase().includes(term) ||
       p.ci.includes(term)
@@ -116,16 +121,15 @@ export class ListaMoleculaComponent implements OnInit {
     }
   }
 
+  // ── NUEVO: abrir gráfico 3D ──────────────────────────────────
   verDetalle(mol: MoleculaCalorica) {
-    alert(`🧬 DETALLE DE MOLÉCULA CALÓRICA\n\n` +
-      `Proteínas: ${mol.proteinas_g_kg} g/kg (${mol.kilocalorias_proteinas?.toFixed(0) || 0} kcal)\n` +
-      `Grasas: ${((mol.porcentaje_grasas || 0) * 100).toFixed(0)}% (${mol.kilocalorias_grasas?.toFixed(0) || 0} kcal)\n` +
-      `Carbohidratos: ${((mol.porcentaje_carbohidratos || 0) * 100).toFixed(0)}% (${mol.kilocalorias_carbohidratos?.toFixed(0) || 0} kcal)\n` +
-      `Peso: ${mol.peso_kg} kg\n` +
-      `Talla: ${mol.talla_cm} cm\n` +
-      `Kcal totales: ${mol.kilocalorias_totales} kcal\n` +
-      `Registrado por: ${mol.registrado_por_nombre || 'N/A'}\n` +
-      `Fecha: ${new Date(mol.created_at!).toLocaleString()}`);
+    this.moleculaSeleccionada = mol;
+    this.mostrarGrafico3d = true;
+  }
+
+  cerrarGrafico3d() {
+    this.mostrarGrafico3d = false;
+    this.moleculaSeleccionada = null;
   }
 
   cambiarEstado(mol: MoleculaCalorica) {

@@ -154,3 +154,11 @@
     (moleculaGuardado)="onMoleculaGuardado()">
   </app-modal-molecula>
 }
+
+@if (mostrarGrafico3d && moleculaSeleccionada) {
+  <app-modal-grafico-3d
+    [mol]="moleculaSeleccionada"
+    (cerrarModal)="cerrarGrafico3d()">
+  </app-modal-grafico-3d>
+}
+ 

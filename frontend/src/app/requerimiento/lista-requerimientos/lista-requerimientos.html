@@ -12,7 +12,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       
       <!-- Panel de Pacientes -->
-      <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden lg:col-span-1">
         <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4">
           <h2 class="text-xl font-bold flex items-center gap-2">
             <span class="text-2xl">👥</span> Pacientes
@@ -78,8 +78,8 @@
                   @for (req of requerimientos; track req.id) {
                     <div class="border rounded-xl p-4 hover:shadow-lg transition-all duration-300">
                       <div class="flex justify-between items-start">
-                        <div>
-                          <div class="flex items-center gap-2 mb-2">
+                        <div class="flex-1">
+                          <div class="flex items-center gap-2 mb-2 flex-wrap">
                             <span class="text-2xl">📅</span>
                             <span class="font-semibold text-gray-700">{{ req.calculado_en | date:'dd/MM/yyyy HH:mm' }}</span>
                             <span class="px-2 py-1 rounded-full text-xs font-semibold"
@@ -105,8 +105,8 @@
                             </div>
                           </div>
                         </div>
-                        <div class="flex gap-2">
-                          <button (click)="verDetalle(req)" class="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                        <div class="flex gap-2 ml-4">
+                          <button (click)="verDetalle(req)" class="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition flex items-center gap-1">
                             📊 Ver
                           </button>
                           <button (click)="cambiarEstado(req)" class="px-3 py-1 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition">
@@ -132,11 +132,19 @@
   </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal formulario -->
 @if (mostrarModal && pacienteSeleccionado) {
   <app-modal-requerimiento 
     [paciente]="pacienteSeleccionado"
     (cerrarModal)="cerrarModal()"
     (requerimientoGuardado)="onRequerimientoGuardado()">
   </app-modal-requerimiento>
+}
+
+<!-- Modal gráfico 3D ← NUEVO -->
+@if (mostrarGrafico3d && requerimientoSeleccionado) {
+  <app-modal-grafico-requerimiento
+    [req]="requerimientoSeleccionado"
+    (cerrarModal)="cerrarGrafico3d()">
+  </app-modal-grafico-requerimiento>
 }

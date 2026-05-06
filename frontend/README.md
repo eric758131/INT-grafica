@@ -149,3 +149,259 @@ frontend
 └─ tsconfig.spec.json
 
 ```
+```
+frontend
+├─ .angular
+├─ .editorconfig
+├─ .postcssrc.json
+├─ angular.json
+├─ package-lock.json
+├─ package.json
+├─ public
+│  ├─ favicon.ico
+│  └─ fondo.jpg
+├─ README.md
+├─ src
+│  ├─ app
+│  │  ├─ app.config.ts
+│  │  ├─ app.css
+│  │  ├─ app.html
+│  │  ├─ app.routes.ts
+│  │  ├─ app.spec.ts
+│  │  ├─ app.ts
+│  │  ├─ camas
+│  │  │  └─ seleccion-camas
+│  │  │     ├─ seleccion-camas.css
+│  │  │     ├─ seleccion-camas.html
+│  │  │     ├─ seleccion-camas.spec.ts
+│  │  │     └─ seleccion-camas.ts
+│  │  ├─ dashboard
+│  │  │  ├─ dashboard.css
+│  │  │  ├─ dashboard.html
+│  │  │  ├─ dashboard.spec.ts
+│  │  │  └─ dashboard.ts
+│  │  ├─ evaluacion
+│  │  │  ├─ calculadora
+│  │  │  ├─ calculos-detallados
+│  │  │  │  ├─ calculos-detallados.css
+│  │  │  │  ├─ calculos-detallados.html
+│  │  │  │  ├─ calculos-detallados.spec.ts
+│  │  │  │  └─ calculos-detallados.ts
+│  │  │  ├─ formulario-evaluacion
+│  │  │  │  ├─ formulario-evaluacion.css
+│  │  │  │  ├─ formulario-evaluacion.html
+│  │  │  │  ├─ formulario-evaluacion.spec.ts
+│  │  │  │  └─ formulario-evaluacion.ts
+│  │  │  ├─ lista-evaluaciones
+│  │  │  │  ├─ lista-evaluaciones.css
+│  │  │  │  ├─ lista-evaluaciones.html
+│  │  │  │  ├─ lista-evaluaciones.spec.ts
+│  │  │  │  └─ lista-evaluaciones.ts
+│  │  │  └─ resultados-evaluacion
+│  │  │     ├─ resultados-evaluacion.css
+│  │  │     ├─ resultados-evaluacion.html
+│  │  │     ├─ resultados-evaluacion.spec.ts
+│  │  │     └─ resultados-evaluacion.ts
+│  │  ├─ guards
+│  │  │  └─ auth.guard.ts
+│  │  ├─ login
+│  │  │  ├─ login.css
+│  │  │  ├─ login.html
+│  │  │  ├─ login.spec.ts
+│  │  │  └─ login.ts
+│  │  ├─ molecula
+│  │  │  ├─ lista-molecula
+│  │  │  │  ├─ lista-molecula.css
+│  │  │  │  ├─ lista-molecula.html
+│  │  │  │  ├─ lista-molecula.spec.ts
+│  │  │  │  └─ lista-molecula.ts
+│  │  │  └─ modal-molecula
+│  │  │     ├─ modal-molecula.css
+│  │  │     ├─ modal-molecula.html
+│  │  │     ├─ modal-molecula.spec.ts
+│  │  │     └─ modal-molecula.ts
+│  │  ├─ pacientes
+│  │  │  ├─ lista-pacientes
+│  │  │  │  ├─ lista-pacientes.css
+│  │  │  │  ├─ lista-pacientes.html
+│  │  │  │  ├─ lista-pacientes.spec.ts
+│  │  │  │  └─ lista-pacientes.ts
+│  │  │  └─ modal-paciente
+│  │  │     ├─ modal-paciente.css
+│  │  │     ├─ modal-paciente.html
+│  │  │     ├─ modal-paciente.spec.ts
+│  │  │     └─ modal-paciente.ts
+│  │  ├─ requerimiento
+│  │  │  ├─ lista-requerimientos
+│  │  │  │  ├─ lista-requerimientos.css
+│  │  │  │  ├─ lista-requerimientos.html
+│  │  │  │  ├─ lista-requerimientos.spec.ts
+│  │  │  │  └─ lista-requerimientos.ts
+│  │  │  └─ modal-requerimiento
+│  │  │     ├─ modal-requerimiento.css
+│  │  │     ├─ modal-requerimiento.html
+│  │  │     ├─ modal-requerimiento.spec.ts
+│  │  │     └─ modal-requerimiento.ts
+│  │  ├─ services
+│  │  │  └─ usuario.service.ts
+│  │  ├─ sidebar
+│  │  │  ├─ sidebar.css
+│  │  │  ├─ sidebar.html
+│  │  │  ├─ sidebar.spec.ts
+│  │  │  └─ sidebar.ts
+│  │  └─ usuarios
+│  │     ├─ crear-usuario
+│  │     │  ├─ crear-usuario.css
+│  │     │  ├─ crear-usuario.html
+│  │     │  ├─ crear-usuario.spec.ts
+│  │     │  └─ crear-usuario.ts
+│  │     ├─ lista-usuarios
+│  │     │  ├─ lista-usuarios.css
+│  │     │  ├─ lista-usuarios.html
+│  │     │  ├─ lista-usuarios.spec.ts
+│  │     │  └─ lista-usuarios.ts
+│  │     └─ modal-usuario
+│  │        ├─ modal-usuario.css
+│  │        ├─ modal-usuario.html
+│  │        ├─ modal-usuario.spec.ts
+│  │        └─ modal-usuario.ts
+│  ├─ index.html
+│  ├─ main.ts
+│  └─ styles.css
+├─ tsconfig.app.json
+├─ tsconfig.json
+└─ tsconfig.spec.json
+
+```
+```
+frontend
+├─ .angular
+├─ .editorconfig
+├─ .postcssrc.json
+├─ angular.json
+├─ package-lock.json
+├─ package.json
+├─ public
+│  ├─ favicon.ico
+│  └─ fondo.jpg
+├─ README.md
+├─ src
+│  ├─ app
+│  │  ├─ app.config.ts
+│  │  ├─ app.css
+│  │  ├─ app.html
+│  │  ├─ app.routes.ts
+│  │  ├─ app.spec.ts
+│  │  ├─ app.ts
+│  │  ├─ camas
+│  │  │  └─ seleccion-camas
+│  │  │     ├─ seleccion-camas.css
+│  │  │     ├─ seleccion-camas.html
+│  │  │     ├─ seleccion-camas.spec.ts
+│  │  │     └─ seleccion-camas.ts
+│  │  ├─ dashboard
+│  │  │  ├─ dashboard.css
+│  │  │  ├─ dashboard.html
+│  │  │  ├─ dashboard.spec.ts
+│  │  │  └─ dashboard.ts
+│  │  ├─ evaluacion
+│  │  │  ├─ calculadora
+│  │  │  ├─ calculos-detallados
+│  │  │  │  ├─ calculos-detallados.css
+│  │  │  │  ├─ calculos-detallados.html
+│  │  │  │  ├─ calculos-detallados.spec.ts
+│  │  │  │  └─ calculos-detallados.ts
+│  │  │  ├─ formulario-evaluacion
+│  │  │  │  ├─ formulario-evaluacion.css
+│  │  │  │  ├─ formulario-evaluacion.html
+│  │  │  │  ├─ formulario-evaluacion.spec.ts
+│  │  │  │  └─ formulario-evaluacion.ts
+│  │  │  ├─ lista-evaluaciones
+│  │  │  │  ├─ lista-evaluaciones.css
+│  │  │  │  ├─ lista-evaluaciones.html
+│  │  │  │  ├─ lista-evaluaciones.spec.ts
+│  │  │  │  └─ lista-evaluaciones.ts
+│  │  │  └─ resultados-evaluacion
+│  │  │     ├─ resultados-evaluacion.css
+│  │  │     ├─ resultados-evaluacion.html
+│  │  │     ├─ resultados-evaluacion.spec.ts
+│  │  │     └─ resultados-evaluacion.ts
+│  │  ├─ guards
+│  │  │  └─ auth.guard.ts
+│  │  ├─ login
+│  │  │  ├─ login.css
+│  │  │  ├─ login.html
+│  │  │  ├─ login.spec.ts
+│  │  │  └─ login.ts
+│  │  ├─ molecula
+│  │  │  ├─ lista-molecula
+│  │  │  │  ├─ lista-molecula.css
+│  │  │  │  ├─ lista-molecula.html
+│  │  │  │  ├─ lista-molecula.spec.ts
+│  │  │  │  └─ lista-molecula.ts
+│  │  │  ├─ modal-grafico-3d
+│  │  │  │  ├─ modal-grafico-3d.css
+│  │  │  │  ├─ modal-grafico-3d.html
+│  │  │  │  └─ modal-grafico-3d.ts
+│  │  │  └─ modal-molecula
+│  │  │     ├─ modal-molecula.css
+│  │  │     ├─ modal-molecula.html
+│  │  │     ├─ modal-molecula.spec.ts
+│  │  │     └─ modal-molecula.ts
+│  │  ├─ pacientes
+│  │  │  ├─ lista-pacientes
+│  │  │  │  ├─ lista-pacientes.css
+│  │  │  │  ├─ lista-pacientes.html
+│  │  │  │  ├─ lista-pacientes.spec.ts
+│  │  │  │  └─ lista-pacientes.ts
+│  │  │  └─ modal-paciente
+│  │  │     ├─ modal-paciente.css
+│  │  │     ├─ modal-paciente.html
+│  │  │     ├─ modal-paciente.spec.ts
+│  │  │     └─ modal-paciente.ts
+│  │  ├─ requerimiento
+│  │  │  ├─ lista-requerimientos
+│  │  │  │  ├─ lista-requerimientos.css
+│  │  │  │  ├─ lista-requerimientos.html
+│  │  │  │  ├─ lista-requerimientos.spec.ts
+│  │  │  │  └─ lista-requerimientos.ts
+│  │  │  ├─ modal-grafico-requerimiento
+│  │  │  │  ├─ modal-grafico-requerimiento.css
+│  │  │  │  ├─ modal-grafico-requerimiento.html
+│  │  │  │  └─ modal-grafico-requerimiento.ts
+│  │  │  └─ modal-requerimiento
+│  │  │     ├─ modal-requerimiento.css
+│  │  │     ├─ modal-requerimiento.html
+│  │  │     ├─ modal-requerimiento.spec.ts
+│  │  │     └─ modal-requerimiento.ts
+│  │  ├─ services
+│  │  │  └─ usuario.service.ts
+│  │  ├─ sidebar
+│  │  │  ├─ sidebar.css
+│  │  │  ├─ sidebar.html
+│  │  │  ├─ sidebar.spec.ts
+│  │  │  └─ sidebar.ts
+│  │  └─ usuarios
+│  │     ├─ crear-usuario
+│  │     │  ├─ crear-usuario.css
+│  │     │  ├─ crear-usuario.html
+│  │     │  ├─ crear-usuario.spec.ts
+│  │     │  └─ crear-usuario.ts
+│  │     ├─ lista-usuarios
+│  │     │  ├─ lista-usuarios.css
+│  │     │  ├─ lista-usuarios.html
+│  │     │  ├─ lista-usuarios.spec.ts
+│  │     │  └─ lista-usuarios.ts
+│  │     └─ modal-usuario
+│  │        ├─ modal-usuario.css
+│  │        ├─ modal-usuario.html
+│  │        ├─ modal-usuario.spec.ts
+│  │        └─ modal-usuario.ts
+│  ├─ index.html
+│  ├─ main.ts
+│  └─ styles.css
+├─ tsconfig.app.json
+├─ tsconfig.json
+└─ tsconfig.spec.json
+
+```
