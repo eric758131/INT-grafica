@@ -10,6 +10,7 @@ from .models import User, Tutor, Paciente
 from .serializers import UserSerializer, UserCreateSerializer, TutorSerializer, PacienteSerializer
 from .models import Medida, Evaluacion, Paciente, OmsRef, FrisanchoRef
 from .serializers import MedidaSerializer, EvaluacionSerializer, EvaluacionDetalleSerializer
+from rest_framework import status
 
 # ViewSet para Usuarios (CRUD completo)
 class UserViewSet(viewsets.ModelViewSet):
@@ -452,6 +453,20 @@ class EvaluacionViewSet(viewsets.ModelViewSet):
             calculos[key] = ref
         
         return Response({'calculos': calculos})
+    
+    # ========== NUEVO ENDPOINT (CORRECTAMENTE INDENTADO) ==========
+    @action(detail=False, methods=['GET'], url_path='paciente/(?P<paciente_id>[^/.]+)')
+    def por_paciente(self, request, paciente_id=None):
+        """Obtiene todas las evaluaciones de un paciente específico"""
+        try:
+            evaluaciones = Evaluacion.objects.filter(medida__paciente_id=paciente_id)
+            serializer = self.get_serializer(evaluaciones, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
     
 
 # ==================== REQUERIMIENTO NUTRICIONAL ====================

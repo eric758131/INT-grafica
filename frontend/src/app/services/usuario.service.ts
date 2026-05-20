@@ -275,6 +275,9 @@ export class UsuarioService {
     return this.http.patch<Cama>(`${this.apiUrl}/camas/${camaId}/`, { paciente: null, estado_cama: 'disponible' });
   }
 
+  activarCama(camaId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/camas/${camaId}/activar`, {});
+  }
   // ========== REFERENCIAS ==========
   getOmsRefs(): Observable<OmsRef[]> {
     return this.http.get<OmsRef[]>(`${this.apiUrl}/oms-ref/`);
@@ -294,7 +297,7 @@ export class UsuarioService {
   }
 
   getEvaluacionesByPaciente(pacienteId: number): Observable<Evaluacion[]> {
-    return this.http.get<Evaluacion[]>(`${this.apiUrl}/evaluaciones/?medida__paciente=${pacienteId}`);
+    return this.http.get<Evaluacion[]>(`${this.apiUrl}/evaluaciones/paciente/${pacienteId}`);
   }
 
   getCalculosDetallados(evaluacionId: number): Observable<any> {
@@ -303,6 +306,10 @@ export class UsuarioService {
 
   getEvaluacionById(id: number): Observable<Evaluacion> {
     return this.http.get<Evaluacion>(`${this.apiUrl}/evaluaciones/${id}/`);
+  }
+  
+  getEvaluaciones(): Observable<Evaluacion[]> {
+    return this.http.get<Evaluacion[]>(`${this.apiUrl}/evaluaciones`);
   }
 
   // Métodos en UsuarioService

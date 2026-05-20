@@ -1,0 +1,50 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal-container">
+    <!-- Header -->
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title">🛏️ Asignar Paciente</h2>
+        <p class="modal-subtitle">Cama #{{ cama.numero }} - {{ cama.ubicacion }}</p>
+      </div>
+      <button class="btn-close" (click)="cerrarModal()">✕</button>
+    </div>
+
+    <!-- Buscador -->
+    <div class="modal-body">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="filtrarPacientes()"
+          placeholder="Buscar por nombre o CI..."
+          class="search-input"
+          autofocus
+        >
+      </div>
+
+      <!-- Lista de pacientes -->
+      <div class="pacientes-list">
+        @for (paciente of pacientesFiltrados; track paciente.id) {
+          <button class="paciente-item" (click)="asignarPaciente(paciente)">
+            <div class="paciente-avatar">
+              <span class="avatar-text">{{ paciente.nombre[0] }}{{ paciente.apellido_paterno[0] }}</span>
+            </div>
+            <div class="paciente-info">
+              <div class="paciente-nombre">
+                {{ paciente.nombre }} {{ paciente.apellido_paterno }} {{ paciente.apellido_materno }}
+              </div>
+              <div class="paciente-ci">CI: {{ paciente.ci }}</div>
+            </div>
+            <div class="paciente-arrow">→</div>
+          </button>
+        } @empty {
+          <div class="empty-state">
+            <span class="empty-icon">👤</span>
+            <p>No se encontraron pacientes</p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

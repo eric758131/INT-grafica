@@ -1,5 +1,24 @@
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
   
+  <!-- Loading Overlay -->
+  @if (asignando) {
+    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+      <div class="bg-white rounded-2xl p-8 flex flex-col items-center gap-4">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+        <p class="text-gray-700 font-semibold">Procesando...</p>
+      </div>
+    </div>
+  }
+
+  <!-- Toast Notification -->
+  @if (mensajeToast) {
+    <div class="fixed top-4 right-4 z-50 animate-slide-in-right">
+      <div [class]="'px-6 py-3 rounded-lg shadow-lg text-white ' + (mensajeToast.tipo === 'success' ? 'bg-green-500' : 'bg-red-500')">
+        {{ mensajeToast.texto }}
+      </div>
+    </div>
+  }
+
   <div class="mb-8">
     <h1 class="text-3xl font-bold text-gray-800">🛏️ Gestión de Camas</h1>
     <p class="text-gray-600 mt-1">Asigna pacientes a camas o libera camas ocupadas</p>
@@ -28,6 +47,12 @@
       </select>
     </div>
     
+    <!-- Botón para gráfica 3D -->
+    <button (click)="abrirModalGrafica()"
+      class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all flex items-center gap-2">
+      🎨 Ver Gráfica 3D
+    </button>
+    
     <div class="flex-1"></div>
     <div class="text-gray-600">Total: {{ camasFiltradas.length }} camas</div>
   </div>
@@ -41,11 +66,22 @@
   @if (!loading) {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       @for (cama of camasFiltradas; track cama.id) {
-        <div class="cama-card rounded-2xl p-5 transition-all duration-300 hover:shadow-2xl"
+        <div class="cama-card rounded-2xl p-5 transition-all duration-300 hover:shadow-2xl hover:scale-105"
           [class.disponible]="cama.estado_cama === 'disponible'"
           [class.ocupada]="cama.estado_cama === 'ocupada'"
           [class.mantenimiento]="cama.estado_cama === 'mantenimiento'"
           [class.reservada]="cama.estado_cama === 'reservada'">
+          
+          <!-- Indicador visual animado con CSS -->
+          <div class="indicador-container mb-4">
+            <div class="indicador-visual" 
+                 [class.indicador-disponible]="cama.estado_cama === 'disponible'"
+                 [class.indicador-ocupada]="cama.estado_cama === 'ocupada'"
+                 [class.indicador-reservada]="cama.estado_cama === 'reservada'"
+                 [class.indicador-mantenimiento]="cama.estado_cama === 'mantenimiento'">
+              <div class="figura"></div>
+            </div>
+          </div>
           
           <div class="flex justify-between items-start mb-3">
             <div class="flex items-center gap-2">
@@ -91,12 +127,15 @@
                 class="w-full py-2 rounded-lg font-semibold transition-all bg-orange-500 text-white hover:bg-orange-600">
                 🔓 Liberar Cama
               </button>
+            } @else if (cama.estado_cama === 'mantenimiento') {
+              <button (click)="activarCama(cama)"
+                class="w-full py-2 rounded-lg font-semibold transition-all bg-green-500 text-white hover:bg-green-600">
+                🔧 Activar Cama
+              </button>
             } @else {
               <button disabled
-                class="w-full py-2 rounded-lg font-semibold opacity-60 cursor-not-allowed"
-                [class.mantenimiento-btn]="cama.estado_cama === 'mantenimiento'"
-                [class.reservada-btn]="cama.estado_cama === 'reservada'">
-                {{ cama.estado_cama === 'mantenimiento' ? '🔧 En Mantenimiento' : '⏳ Reservada' }}
+                class="w-full py-2 rounded-lg font-semibold opacity-60 cursor-not-allowed reservada-btn">
+                ⏳ Reservada
               </button>
             }
           </div>
@@ -110,32 +149,17 @@
   }
 </div>
 
-<!-- Modal de selección de pacientes -->
-@if (mostrarModalPacientes && camaParaAsignar) {
-  <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" (click)="mostrarModalPacientes = false">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto" (click)="$event.stopPropagation()">
-      <div class="bg-gradient-to-r from-green-600 to-teal-600 text-white p-5 rounded-t-2xl sticky top-0">
-        <div class="flex justify-between items-center">
-          <h2 class="text-xl font-bold">👤 Seleccionar Paciente para Cama {{ camaParaAsignar.numero }}</h2>
-          <button (click)="mostrarModalPacientes = false" class="hover:bg-white/20 rounded-lg p-2">✕</button>
-        </div>
-      </div>
-      <div class="p-6">
-        <div class="grid gap-3">
-          @for (paciente of pacientes; track paciente.id) {
-            <button (click)="asignarPaciente(paciente)"
-              class="text-left p-4 border rounded-xl hover:bg-green-50 hover:border-green-500 transition-all flex justify-between items-center">
-              <div>
-                <div class="font-semibold">{{ paciente.nombre }} {{ paciente.apellido_paterno }} {{ paciente.apellido_materno }}</div>
-                <div class="text-sm text-gray-500">CI: {{ paciente.ci }}</div>
-              </div>
-              <span class="text-green-600 text-xl">→</span>
-            </button>
-          } @empty {
-            <p class="text-center text-gray-500">No hay pacientes registrados</p>
-          }
-        </div>
-      </div>
-    </div>
-  </div>
+<!-- Modal de Asignación de Paciente -->
+@if (mostrarModalAsignacion && camaParaAsignar) {
+  <app-modal-asignar-paciente
+    [cama]="camaParaAsignar"
+    [pacientes]="pacientes"
+    (cerrar)="cerrarModalAsignacion()"
+    (asignar)="asignarPaciente($event)">
+  </app-modal-asignar-paciente>
+}
+
+<!-- Modal de Gráfica 3D -->
+@if (mostrarModalGrafica) {
+  <app-modal-grafica-3d #modalGrafica></app-modal-grafica-3d>
 }

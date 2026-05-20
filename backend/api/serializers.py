@@ -247,3 +247,11 @@ class MoleculaCaloricaCreateSerializer(serializers.ModelSerializer):
         )
         instance.save()
         return instance
+    
+class MedidaSerializer(serializers.ModelSerializer):
+    paciente_id = serializers.IntegerField(source='paciente.id', read_only=True)
+    paciente_nombre = serializers.CharField(source='paciente.nombre', read_only=True)
+    
+    class Meta:
+        model = Medida
+        fields = ['id', 'paciente_id', 'paciente_nombre', 'peso_kg', 'talla_cm', 'pb_mm', 'pct_mm', 'fecha']
