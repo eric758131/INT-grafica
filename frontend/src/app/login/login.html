@@ -1,0 +1,139 @@
+<div class="relative min-h-screen w-full overflow-hidden">
+  
+<!-- Imagen de fondo local -->
+   <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute inset-0 w-[200%] animate-pan">
+      <img src="fondo.jpg" alt="Fondo Login" class="w-full h-full object-cover">
+    </div>
+    <div class="absolute inset-0 bg-black/60"></div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="relative z-10 min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md transform transition-all duration-1000 animate__animated animate__fadeInUp">
+      
+      <div class="relative group">
+        <div class="absolute -inset-1 bg-gradient-to-r from-pink-600 to-purple-600 rounded-2xl blur-xl opacity-75 group-hover:opacity-100 transition duration-1000 animate-gradient"></div>
+        
+        <div class="relative bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/20">
+          
+          <!-- Logo o ícono -->
+          <div class="flex justify-center mb-8">
+            <div class="w-24 h-24 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl rotate-45 transform hover:rotate-0 transition-all duration-700 cursor-pointer shadow-2xl flex items-center justify-center group">
+              <svg class="w-12 h-12 text-white -rotate-45 group-hover:rotate-0 transition-all duration-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Título -->
+          <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">Bienvenido</h1>
+            <p class="text-white/70">Sistema de Gestión Integral</p>
+          </div>
+
+          <!-- Mensaje de error -->
+          @if (errorMessage) {
+            <div class="mb-6 bg-red-500/20 border border-red-500/50 text-white px-4 py-3 rounded-xl backdrop-blur-sm">
+              <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                </svg>
+                {{ errorMessage }}
+              </div>
+            </div>
+          }
+
+          <!-- Formulario -->
+          <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="space-y-6">
+            
+            <div class="group">
+              <label class="block text-white/80 text-sm font-bold mb-2 transition-all group-hover:text-white">
+                Correo Electrónico
+              </label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/50">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                  </svg>
+                </span>
+                <input
+                  [(ngModel)]="email"
+                  name="email"
+                  required
+                  email
+                  #emailInput="ngModel"
+                  type="email"
+                  id="email"
+                  placeholder="tu@email.com"
+                  class="w-full pl-12 pr-4 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:bg-white/20 focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500/50 transition-all duration-300"
+                >
+              </div>
+            </div>
+
+            <div class="group">
+              <label class="block text-white/80 text-sm font-bold mb-2 transition-all group-hover:text-white">
+                Contraseña
+              </label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/50">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                  </svg>
+                </span>
+                <input
+                  [(ngModel)]="password"
+                  name="password"
+                  required
+                  #passwordInput="ngModel"
+                  type="password"
+                  id="password"
+                  placeholder="********"
+                  class="w-full pl-12 pr-4 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:bg-white/20 focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500/50 transition-all duration-300"
+                >
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <label class="flex items-center cursor-pointer group">
+                <input type="checkbox" class="w-4 h-4 bg-white/10 border border-white/20 rounded">
+                <span class="ml-2 text-sm text-white/70 group-hover:text-white transition-colors">Recordarme</span>
+              </label>
+              <a href="#" class="text-sm text-white/70 hover:text-white transition-colors relative group">
+                ¿Olvidaste tu contraseña?
+                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-pink-500 group-hover:w-full transition-all duration-300"></span>
+              </a>
+            </div>
+
+            <button
+              type="submit"
+              [disabled]="loading || loginForm.invalid"
+              class="relative w-full py-4 px-4 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl transform transition-all duration-500 hover:scale-105 hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden"
+            >
+              <span class="absolute inset-0 bg-white/10 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-700"></span>
+              @if (loading) {
+                <div class="flex items-center justify-center">
+                  <svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Ingresando...</span>
+                </div>
+              } @else {
+                <span class="relative z-10">Ingresar al Sistema</span>
+              }
+            </button>
+
+            <p class="text-center text-white/60 text-sm">
+              ¿No tienes una cuenta? 
+              <a href="#" class="text-pink-400 hover:text-pink-300 font-semibold transition-colors relative group">
+                Regístrate
+                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-pink-400 group-hover:w-full transition-all duration-300"></span>
+              </a>
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

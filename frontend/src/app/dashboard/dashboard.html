@@ -1,0 +1,58 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative">
+  
+  <!-- Canvas para Three.js -->
+  <div #canvasContainer class="fixed inset-0 z-0 pointer-events-none"></div>
+  
+  <!-- Sidebar fijo -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Contenido principal con margen izquierdo -->
+  <div class="ml-64 min-h-screen relative z-10">
+    
+    <!-- Decoración de fondo adicional (opcional, puedes quitarla si prefieres solo Three.js) -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <svg class="absolute inset-0 w-full h-full opacity-5" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle fill="currentColor" cx="2" cy="2" r="1.5"></circle>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#dots)" class="text-gray-600"></rect>
+      </svg>
+    </div>
+
+    <!-- Header mejorado -->
+    <header class="relative bg-white/80 backdrop-blur-md shadow-lg p-4 flex justify-between items-center sticky top-0 border-b border-white/20 z-20">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+          <span class="text-white text-xl">📊</span>
+        </div>
+        <h2 class="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+          {{ pageTitle }}
+        </h2>
+      </div>
+      
+      <div class="flex items-center gap-4">
+        <div class="relative group">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl blur opacity-0 group-hover:opacity-50 transition duration-300"></div>
+          <div class="relative bg-white rounded-xl px-4 py-2 shadow-md flex items-center gap-3">
+            <div class="text-right">
+              <p class="text-sm text-gray-500">Bienvenido,</p>
+              <p class="font-semibold text-gray-800">{{ nombreUsuario }}</p>
+            </div>
+            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+              {{ iniciales }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido dinámico con tarjeta flotante -->
+    <main class="relative z-10 p-6">
+      <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>

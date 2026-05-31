@@ -1,0 +1,241 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+  <div class="max-w-6xl mx-auto">
+    
+    <!-- Header -->
+    <div class="mb-8 animate-fadeIn">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            📝 Nueva Evaluación Nutricional
+          </h1>
+          <p class="text-gray-600 mt-1">Complete los datos antropométricos del paciente</p>
+        </div>
+        <button (click)="volver()" 
+          class="px-5 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg hover:scale-105">
+          <span>←</span> Volver
+        </button>
+      </div>
+    </div>
+
+    <!-- Info del paciente con glassmorphism -->
+    @if (paciente) {
+      <div class="relative overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-5 text-white mb-6 shadow-xl animate-slideUp">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mt-16 -mr-16"></div>
+        <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -mb-12 -ml-12"></div>
+        
+        <div class="relative z-10 flex items-center gap-4">
+          <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-3xl backdrop-blur-sm">
+            👤
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold">{{ paciente.nombre }} {{ paciente.apellido_paterno }} {{ paciente.apellido_materno }}</h2>
+            <div class="flex gap-4 mt-1 text-sm opacity-90 flex-wrap">
+              <span>📄 CI: {{ paciente.ci }}</span>
+              <span>⚧ {{ paciente.genero === 'masculino' ? 'Masculino' : 'Femenino' }}</span>
+              <span>🎂 {{ paciente.fecha_nacimiento | date:'dd/MM/yyyy' }} ({{ calcularEdad(paciente.fecha_nacimiento) }} años)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Formulario de medición -->
+    <div class="bg-white rounded-2xl shadow-xl p-6 mb-6 animate-slideUp" style="animation-delay: 0.1s">
+      <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <span class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full flex items-center justify-center text-sm">1</span>
+        Datos de Medición
+      </h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">📅 Fecha *</label>
+          <input type="date" [(ngModel)]="medicion.fecha" 
+            class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">⚖️ Peso (kg) *</label>
+          <input type="number" step="0.01" [(ngModel)]="medicion.peso_kg" placeholder="ej: 32.5"
+            class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">📏 Talla (cm) *</label>
+          <input type="number" step="0.1" [(ngModel)]="medicion.talla_cm" placeholder="ej: 145.5"
+            class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">📐 PB (mm) *</label>
+          <input type="number" step="0.1" [(ngModel)]="medicion.pb_mm" placeholder="ej: 220"
+            class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">📊 PCT (mm) *</label>
+          <input type="number" step="0.1" [(ngModel)]="medicion.pct_mm" placeholder="ej: 12.5"
+            class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+        </div>
+      </div>
+      
+      <div class="mt-6">
+        <button (click)="calcular()" [disabled]="calculando" 
+          class="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+          @if (calculando) {
+            <span class="flex items-center justify-center gap-2">
+              <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              Calculando...
+            </span>
+          } @else {
+            <span>🔬 Calcular Evaluación</span>
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- Resultados -->
+    @if (resultados) {
+      <div id="resultadosSection" class="bg-white rounded-2xl shadow-xl p-6 mb-6 animate-scaleIn" style="animation-delay: 0.2s">
+        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+          <span class="w-8 h-8 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full flex items-center justify-center text-sm">2</span>
+          Resultados del Cálculo
+        </h3>
+
+        <!-- IMC Principal -->
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-5 text-white mb-6">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm opacity-80">Índice de Masa Corporal (IMC)</p>
+              <p class="text-4xl font-bold">{{ resultados.imc }} <span class="text-lg">kg/m²</span></p>
+            </div>
+            <div class="text-center bg-white/20 rounded-xl px-4 py-2">
+              <p class="text-xs">Z-Score</p>
+              <p class="text-2xl font-bold">{{ resultados.z_scores.imc }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Medidas Derivadas -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 hover:shadow-md transition">
+            <p class="text-sm text-gray-600">💪 CMB</p>
+            <p class="text-xl font-bold text-blue-600">{{ resultados.cmb_mm }} mm</p>
+            <div class="mt-2 inline-block px-2 py-1 rounded-lg text-xs font-semibold bg-blue-200 text-blue-700">
+              Z: {{ resultados.z_scores.cmb }}
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Circunferencia Muscular Braquial</p>
+          </div>
+          <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 hover:shadow-md transition">
+            <p class="text-sm text-gray-600">🟢 AMB</p>
+            <p class="text-xl font-bold text-purple-600">{{ resultados.amb_mm2 }} mm²</p>
+            <div class="mt-2 inline-block px-2 py-1 rounded-lg text-xs font-semibold bg-purple-200 text-purple-700">
+              Z: {{ resultados.z_scores.amb }}
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Área Muscular Braquial</p>
+          </div>
+          <div class="bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-xl p-4 hover:shadow-md transition">
+            <p class="text-sm text-gray-600">🟠 AGB</p>
+            <p class="text-xl font-bold text-cyan-600">{{ resultados.agb_mm2 }} mm²</p>
+            <div class="mt-2 inline-block px-2 py-1 rounded-lg text-xs font-semibold bg-cyan-200 text-cyan-700">
+              Z: {{ resultados.z_scores.agb }}
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Área Grasa Braquial</p>
+          </div>
+        </div>
+
+        <!-- Resumen adicional -->
+        <div class="bg-gray-50 rounded-xl p-4 mb-6">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div>
+              <p class="text-xs text-gray-500">Edad en Medición</p>
+              <p class="font-bold text-blue-600">{{ resultados.edad_meses }} meses</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Peso Ideal</p>
+              <p class="font-bold text-green-600">{{ resultados.peso_ideal }} kg</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Diferencia de Peso</p>
+              <p class="font-bold" [class.text-green-600]="resultados.dif_peso >= 0" [class.text-red-600]="resultados.dif_peso < 0">
+                {{ resultados.dif_peso >= 0 ? '+' : '' }}{{ resultados.dif_peso }} kg
+              </p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Referencia</p>
+              <p class="font-bold text-purple-600">{{ resultados.edad_anios }} años</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Diagnósticos -->
+        <h4 class="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+          <span class="w-6 h-6 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full flex items-center justify-center text-xs">3</span>
+          Diagnósticos Nutricionales
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm font-medium text-gray-600">Diagnóstico IMC *</label>
+            <textarea [(ngModel)]="diagnosticos.dx_z_imc" rows="2" 
+              class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+              placeholder="Ej: Estado nutricional normal según IMC..."></textarea>
+          </div>
+          <div>
+            <label class="text-sm font-medium text-gray-600">Diagnóstico Talla *</label>
+            <textarea [(ngModel)]="diagnosticos.dx_z_talla" rows="2"
+              class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+              placeholder="Ej: Talla adecuada para la edad..."></textarea>
+          </div>
+          <div>
+            <label class="text-sm font-medium text-gray-600">Diagnóstico PB *</label>
+            <textarea [(ngModel)]="diagnosticos.dx_z_pb" rows="2"
+              class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+              placeholder="Ej: Perímetro braquial normal..."></textarea>
+          </div>
+          <div>
+            <label class="text-sm font-medium text-gray-600">Diagnóstico PCT *</label>
+            <textarea [(ngModel)]="diagnosticos.dx_z_pct" rows="2"
+              class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+              placeholder="Ej: Pliegue tricipital adecuado..."></textarea>
+          </div>
+          <div>
+            <label class="text-sm font-medium text-gray-600">Diagnóstico CMB *</label>
+            <textarea [(ngModel)]="diagnosticos.dx_z_cmb" rows="2"
+              class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+              placeholder="Ej: Masa muscular conservada..."></textarea>
+          </div>
+          <div>
+            <label class="text-sm font-medium text-gray-600">Diagnóstico AMB *</label>
+            <textarea [(ngModel)]="diagnosticos.dx_z_amb" rows="2"
+              class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+              placeholder="Ej: Área muscular adecuada..."></textarea>
+          </div>
+          <div class="md:col-span-2">
+            <label class="text-sm font-medium text-gray-600">Diagnóstico AGB *</label>
+            <textarea [(ngModel)]="diagnosticos.dx_z_agb" rows="2"
+              class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+              placeholder="Ej: Área grasa dentro de parámetros normales..."></textarea>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+          <button (click)="volver()" 
+            class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all hover:scale-105">
+            Cancelar
+          </button>
+          <button (click)="guardarEvaluacion()" [disabled]="!diagnosticosCompletos() || guardando" 
+            class="px-6 py-2 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-lg hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+            @if (guardando) {
+              <span class="flex items-center gap-2">
+                <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Guardando...
+              </span>
+            } @else {
+              <span class="flex items-center gap-2">
+                💾 Guardar Evaluación
+              </span>
+            }
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,211 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
+  <div class="w-full max-w-[1600px] mx-auto px-2 sm:px-4 md:px-6">
+    
+    <!-- Header -->
+    <div class="mb-6 md:mb-8 animate-fadeIn">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            📊 Evaluaciones Nutricionales
+          </h1>
+          <p class="text-gray-600 text-sm md:text-base mt-1">Gestione las evaluaciones nutricionales de sus pacientes</p>
+        </div>
+        <button (click)="volver()" 
+          class="px-4 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg hover:scale-105 text-sm md:text-base">
+          <span>←</span> Volver
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
+      
+      <!-- Panel de Pacientes -->
+      <div class="lg:col-span-4 xl:col-span-3 animate-slideInLeft">
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden sticky top-6">
+          <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-4 md:p-5">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="text-2xl">👥</span>
+              <h5 class="text-white font-bold text-base md:text-lg">Pacientes</h5>
+            </div>
+            <div class="relative">
+              <input type="text" 
+                class="w-full px-4 py-2 md:py-3 rounded-xl border-0 focus:ring-2 focus:ring-blue-300 text-gray-700 pl-10 text-sm md:text-base" 
+                [(ngModel)]="searchTerm" 
+                placeholder="Buscar paciente...">
+              <span class="absolute left-3 top-2 md:top-3 text-gray-400 text-sm md:text-base">🔍</span>
+            </div>
+          </div>
+          
+          <div class="max-h-[500px] md:max-h-[600px] overflow-y-auto">
+            @if (loading) {
+              <div class="p-8 text-center">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+                <p class="mt-2 text-gray-500 text-sm">Cargando pacientes...</p>
+              </div>
+            }
+            
+            @for (paciente of pacientesFiltrados; track paciente.id) {
+              <div (click)="seleccionarPaciente(paciente)"
+                class="border-b border-gray-100 cursor-pointer transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50"
+                [class.bg-gradient-to-r]="pacienteSeleccionado?.id === paciente.id"
+                [class.from-blue-100]="pacienteSeleccionado?.id === paciente.id"
+                [class.to-purple-100]="pacienteSeleccionado?.id === paciente.id"
+                [class.border-l-4]="pacienteSeleccionado?.id === paciente.id"
+                [class.border-l-blue-500]="pacienteSeleccionado?.id === paciente.id">
+                <div class="p-3 md:p-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold shadow-md text-sm">
+                      {{ paciente.nombre.charAt(0) }}{{ paciente.apellido_paterno.charAt(0) }}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-semibold text-gray-800 text-sm md:text-base truncate">{{ paciente.nombre }} {{ paciente.apellido_paterno }}</div>
+                      <div class="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                        <span>📄</span> CI: {{ paciente.ci }}
+                      </div>
+                    </div>
+                    @if (pacienteSeleccionado?.id === paciente.id) {
+                      <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+            
+            @if (pacientesFiltrados.length === 0 && !loading) {
+              <div class="p-8 text-center">
+                <div class="text-5xl mb-3">📋</div>
+                <p class="text-gray-500 text-sm">No se encontraron pacientes</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel de Evaluaciones -->
+      <div class="lg:col-span-8 xl:col-span-9 animate-slideInRight">
+        @if (pacienteSeleccionado) {
+          <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-4 md:p-5">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-2xl">📋</span>
+                      <h5 class="text-white font-bold text-base md:text-lg">Evaluaciones de {{ pacienteSeleccionado.nombre }}</h5>
+                    </div>
+                    <p class="text-blue-100 text-xs md:text-sm mt-1">Historial de evaluaciones nutricionales</p>
+                  </div>
+                  <div class="flex gap-2">
+                    <button (click)="abrirGraficaEvolucion()" 
+                      [disabled]="evaluaciones.length < 2"
+                      class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:scale-105 transition-all duration-300 flex items-center gap-2 font-semibold shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base">
+                      <span>📈</span> Ver Evolución
+                    </button>
+                    <button (click)="nuevaEvaluacion()"
+                      class="px-4 py-2 bg-white text-blue-600 rounded-xl hover:bg-gray-100 transition-all duration-300 flex items-center gap-2 font-semibold shadow-md hover:scale-105 text-sm md:text-base">
+                      <span>➕</span> Nueva Evaluación
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="p-4 md:p-6">
+              @if (cargandoEvaluaciones) {
+                <div class="text-center py-12">
+                  <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
+                  <p class="mt-3 text-gray-500 text-sm">Cargando evaluaciones...</p>
+                </div>
+              } @else if (evaluaciones.length === 0) {
+                <div class="text-center py-12">
+                  <div class="text-6xl mb-4">📊</div>
+                  <p class="text-gray-500 text-base">No hay evaluaciones registradas para este paciente</p>
+                  <button (click)="nuevaEvaluacion()"
+                    class="mt-4 px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:scale-105 transition shadow-md text-sm">
+                    + Crear primera evaluación
+                  </button>
+                </div>
+              } @else {
+                <div class="overflow-x-auto">
+                  <table class="w-full min-w-[500px]">
+                    <thead>
+                      <tr class="border-b-2 border-gray-200 bg-gray-50">
+                        <th class="text-left py-3 px-3 md:px-4 text-xs md:text-sm font-semibold text-gray-600">📅 Fecha</th>
+                        <th class="text-left py-3 px-3 md:px-4 text-xs md:text-sm font-semibold text-gray-600">⚖️ IMC</th>
+                        <th class="text-left py-3 px-3 md:px-4 text-xs md:text-sm font-semibold text-gray-600">💪 CMB</th>
+                        <th class="text-left py-3 px-3 md:px-4 text-xs md:text-sm font-semibold text-gray-600">🏷️ Clasificación</th>
+                        <th class="text-center py-3 px-3 md:px-4 text-xs md:text-sm font-semibold text-gray-600">⚙️ Acción</th>
+                       </tr>
+                    </thead>
+                    <tbody>
+                      @for (eval of evaluaciones; track eval.id) {
+                        <tr class="border-b border-gray-100 hover:bg-gray-50 transition-all duration-200 group">
+                          <td class="py-3 px-3 md:px-4">
+                            <div class="flex items-center gap-2">
+                              <span class="text-blue-500 text-xs md:text-sm">📆</span>
+                              <span class="text-xs md:text-sm">{{ eval.created_at | date:'dd/MM/yyyy' }}</span>
+                            </div>
+                           </td>
+                          <td class="py-3 px-3 md:px-4">
+                            <span class="font-semibold text-gray-700 text-sm md:text-base">{{ eval.imc }}</span>
+                           </td>
+                          <td class="py-3 px-3 md:px-4">
+                            <span class="text-gray-700 text-sm md:text-base">{{ eval.cmb_mm }} mm</span>
+                           </td>
+                          <td class="py-3 px-3 md:px-4">
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold" 
+                                  [class]="getClasificacionColor(eval.imc)">
+                              {{ getClasificacionTexto(eval.imc) }}
+                            </span>
+                           </td>
+                          <td class="text-center py-3 px-3 md:px-4">
+                            <button (click)="verResultados(eval)"
+                              class="px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-xs md:text-sm flex items-center gap-1 shadow-md hover:shadow-lg hover:scale-105 mx-auto">
+                              <span>👁️</span> Ver Detalles
+                            </button>
+                           </td>
+                         </tr>
+                      }
+                    </tbody>
+                   </table>
+                </div>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="bg-white rounded-2xl shadow-xl p-12 text-center">
+            <div class="text-6xl mb-4 animate-bounce">👈</div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">Seleccione un paciente</h3>
+            <p class="text-gray-500 text-sm">Elija un paciente de la lista para ver sus evaluaciones nutricionales</p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Gráfica de Evolución -->
+@if (mostrarGraficaEvolucion) {
+  <div class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" (click)="cerrarGraficaEvolucion()">
+    <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[85vh] overflow-hidden" (click)="$event.stopPropagation()">
+      <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-5">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-bold text-white">📊 Evolución Nutricional</h2>
+            <p class="text-blue-100 text-sm mt-1">{{ pacienteSeleccionado?.nombre }} - Seguimiento de medidas</p>
+          </div>
+          <button (click)="cerrarGraficaEvolucion()" class="text-white hover:bg-white/20 rounded-lg p-2 text-2xl">✕</button>
+        </div>
+      </div>
+      <div class="p-6">
+        <canvas id="graficaCanvas" width="800" height="450" style="width:100%; height:auto; max-width:800px; margin:0 auto; display:block; background:#f8fafc; border-radius:12px;"></canvas>
+        <div class="flex justify-center gap-6 mt-4 text-xs text-gray-500">
+          <div class="flex items-center gap-1"><div class="w-3 h-3 bg-blue-500 rounded-full"></div> IMC (kg/m²)</div>
+          <div class="flex items-center gap-1"><div class="w-3 h-3 bg-purple-500 rounded-full"></div> CMB (mm)</div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+}

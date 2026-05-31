@@ -1,0 +1,81 @@
+<div class="modal-overlay" (click)="cerrar()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-left">
+        <span class="header-icon">🧬</span>
+        <div>
+          <h2 class="modal-title">Molécula Calórica 3D</h2>
+          <p class="modal-subtitle">{{ fechaFormateada }}</p>
+        </div>
+      </div>
+      <button class="btn-close" (click)="cerrar()">✕</button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+
+      <!-- Canvas Three.js -->
+      <div class="canvas-wrapper">
+        <canvas #threeCanvas class="three-canvas"></canvas>
+        <div class="canvas-hint">Arrastra para rotar · Rueda para zoom</div>
+      </div>
+
+      <!-- Leyenda + datos -->
+      <div class="info-panel">
+
+        <div class="macro-card macro-prot">
+          <div class="macro-dot" style="background:#a855f7"></div>
+          <div class="macro-info">
+            <span class="macro-label">Proteínas</span>
+            <span class="macro-pct">{{ protPct }}%</span>
+            <span class="macro-kcal">{{ +(mol?.kilocalorias_proteinas || 0) | number:'1.0-0' }} kcal</span>
+            <span class="macro-sub">{{ mol?.proteinas_g_kg }} g/kg</span>
+          </div>
+        </div>
+
+        <div class="macro-card macro-gras">
+          <div class="macro-dot" style="background:#f59e0b"></div>
+          <div class="macro-info">
+            <span class="macro-label">Grasas</span>
+            <span class="macro-pct">{{ grasPct }}%</span>
+            <span class="macro-kcal">{{ +(mol?.kilocalorias_grasas || 0) | number:'1.0-0' }} kcal</span>
+          </div>
+        </div>
+
+        <div class="macro-card macro-carb">
+          <div class="macro-dot" style="background:#3b82f6"></div>
+          <div class="macro-info">
+            <span class="macro-label">Carbohidratos</span>
+            <span class="macro-pct">{{ carbPct }}%</span>
+            <span class="macro-kcal">{{ +(mol?.kilocalorias_carbohidratos || 0) | number:'1.0-0' }} kcal</span>
+          </div>
+        </div>
+
+        <div class="total-box">
+          <span class="total-label">Total</span>
+          <span class="total-value">{{ +(mol?.kilocalorias_totales || 0) | number:'1.0-0' }}</span>
+          <span class="total-unit">kcal</span>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat">
+            <span class="stat-label">Peso</span>
+            <span class="stat-value">{{ mol?.peso_kg }} kg</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Talla</span>
+            <span class="stat-value">{{ mol?.talla_cm }} cm</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Estado</span>
+            <span class="stat-badge" [class.activo]="mol?.estado === 'activo'">{{ mol?.estado }}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

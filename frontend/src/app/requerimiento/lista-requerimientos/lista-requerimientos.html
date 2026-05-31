@@ -1,0 +1,150 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+        📊 Requerimientos Nutricionales
+      </h1>
+      <p class="text-gray-600 mt-1">Gestión de requerimientos nutricionales por paciente</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Panel de Pacientes -->
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden lg:col-span-1">
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4">
+          <h2 class="text-xl font-bold flex items-center gap-2">
+            <span class="text-2xl">👥</span> Pacientes
+          </h2>
+          <p class="text-sm opacity-90">Seleccione un paciente</p>
+        </div>
+        
+        <div class="p-4 border-b">
+          <input type="text" [(ngModel)]="searchTerm" placeholder="🔍 Buscar paciente..." 
+            class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        
+        <div class="max-h-96 overflow-y-auto">
+          @for (paciente of pacientesFiltrados; track paciente.id) {
+            <div (click)="seleccionarPaciente(paciente)"
+              class="p-4 border-b cursor-pointer transition-all duration-300 hover:bg-blue-50"
+              [class.bg-blue-100]="pacienteSeleccionado?.id === paciente.id">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                  {{ paciente.nombre.charAt(0) }}{{ paciente.apellido_paterno.charAt(0) }}
+                </div>
+                <div class="flex-1">
+                  <h3 class="font-semibold text-gray-800">{{ paciente.nombre }} {{ paciente.apellido_paterno }}</h3>
+                  <p class="text-sm text-gray-500">CI: {{ paciente.ci }} | Edad: {{ paciente.edad }} años</p>
+                </div>
+                <div class="text-gray-400">→</div>
+              </div>
+            </div>
+          }
+          @if (pacientesFiltrados.length === 0 && !loading) {
+            <div class="p-8 text-center text-gray-500">No hay pacientes registrados</div>
+          }
+        </div>
+      </div>
+
+      <!-- Panel de Requerimientos -->
+      <div class="lg:col-span-2">
+        @if (pacienteSeleccionado) {
+          <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="bg-gradient-to-r from-green-500 to-teal-600 text-white p-4 flex justify-between items-center">
+              <div>
+                <h2 class="text-xl font-bold">Requerimientos de {{ pacienteSeleccionado.nombre }}</h2>
+                <p class="text-sm opacity-90">Historial de cálculos nutricionales</p>
+              </div>
+              <button (click)="abrirModal()" 
+                class="px-4 py-2 bg-white text-green-600 rounded-xl font-semibold hover:scale-105 transition shadow-lg">
+                ➕ Nuevo Requerimiento
+              </button>
+            </div>
+            
+            <div class="p-4">
+              @if (requerimientos.length === 0) {
+                <div class="text-center py-12">
+                  <div class="text-6xl mb-4">📊</div>
+                  <h3 class="text-xl font-semibold text-gray-600">Sin requerimientos</h3>
+                  <p class="text-gray-400 mt-2">No hay requerimientos registrados para este paciente</p>
+                  <button (click)="abrirModal()" class="mt-4 px-6 py-2 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-xl hover:scale-105 transition">
+                    + Crear primer requerimiento
+                  </button>
+                </div>
+              } @else {
+                <div class="grid gap-4">
+                  @for (req of requerimientos; track req.id) {
+                    <div class="border rounded-xl p-4 hover:shadow-lg transition-all duration-300">
+                      <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                          <div class="flex items-center gap-2 mb-2 flex-wrap">
+                            <span class="text-2xl">📅</span>
+                            <span class="font-semibold text-gray-700">{{ req.calculado_en | date:'dd/MM/yyyy HH:mm' }}</span>
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold"
+                              [class.bg-green-100]="req.estado === 'activo'"
+                              [class.text-green-800]="req.estado === 'activo'"
+                              [class.bg-red-100]="req.estado !== 'activo'"
+                              [class.text-red-800]="req.estado !== 'activo'">
+                              {{ req.estado }}
+                            </span>
+                          </div>
+                          <div class="grid grid-cols-3 gap-4 mt-2">
+                            <div class="text-center">
+                              <div class="text-2xl font-bold text-blue-600">{{ req.get_kcal }}</div>
+                              <div class="text-xs text-gray-500">GET (kcal/día)</div>
+                            </div>
+                            <div class="text-center">
+                              <div class="text-2xl font-bold text-green-600">{{ req.geb_kcal }}</div>
+                              <div class="text-xs text-gray-500">GEB (kcal/día)</div>
+                            </div>
+                            <div class="text-center">
+                              <div class="text-2xl font-bold text-purple-600">{{ req.kcal_por_kg }}</div>
+                              <div class="text-xs text-gray-500">Kcal/kg</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="flex gap-2 ml-4">
+                          <button (click)="verDetalle(req)" class="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition flex items-center gap-1">
+                            📊 Ver
+                          </button>
+                          <button (click)="cambiarEstado(req)" class="px-3 py-1 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition">
+                            🔄 Estado
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="bg-white rounded-2xl shadow-xl p-12 text-center">
+            <div class="text-6xl mb-4">👈</div>
+            <h3 class="text-xl font-semibold text-gray-600">Seleccione un paciente</h3>
+            <p class="text-gray-400 mt-2">Elija un paciente del panel izquierdo</p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal formulario -->
+@if (mostrarModal && pacienteSeleccionado) {
+  <app-modal-requerimiento 
+    [paciente]="pacienteSeleccionado"
+    (cerrarModal)="cerrarModal()"
+    (requerimientoGuardado)="onRequerimientoGuardado()">
+  </app-modal-requerimiento>
+}
+
+<!-- Modal gráfico 3D ← NUEVO -->
+@if (mostrarGrafico3d && requerimientoSeleccionado) {
+  <app-modal-grafico-requerimiento
+    [req]="requerimientoSeleccionado"
+    (cerrarModal)="cerrarGrafico3d()">
+  </app-modal-grafico-requerimiento>
+}

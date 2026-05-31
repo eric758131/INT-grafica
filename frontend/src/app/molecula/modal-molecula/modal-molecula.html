@@ -1,0 +1,255 @@
+<div class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all duration-300" 
+     (click)="cerrar()">
+  
+  <!-- Modal con animación de entrada -->
+  <div class="relative bg-white rounded-3xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-y-auto transform transition-all duration-500 ease-out animate-modal-slide-in" 
+       (click)="$event.stopPropagation()">
+    
+    <!-- Header con gradiente animado -->
+    <div class="sticky top-0 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-[length:200%_200%] animate-gradient text-white p-6 rounded-t-3xl z-10 shadow-xl">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl animate-pulse-slow">
+            🧬
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold">Calcular Molécula Calórica</h2>
+            <p class="text-sm text-white/80 mt-1">Distribución de macronutrientes según requerimiento</p>
+          </div>
+        </div>
+        <button (click)="cerrar()" 
+                class="hover:bg-white/20 rounded-xl p-2 transition-all duration-300 hover:scale-110 hover:rotate-90">
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="p-6 bg-gradient-to-b from-gray-50 to-white">
+      
+      <!-- Info Paciente con efecto glass -->
+      <div class="relative overflow-hidden bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 bg-[length:200%_200%] animate-gradient rounded-2xl p-5 text-white mb-6 shadow-xl">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mt-16 -mr-16 animate-pulse-slow"></div>
+        <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -mb-12 -ml-12 animate-pulse-slow animation-delay-1000"></div>
+        
+        <div class="relative z-10 flex items-center gap-4">
+          <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-2xl backdrop-blur-sm">
+            👤
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-bold">{{ paciente?.nombre }} {{ paciente?.apellido_paterno }}</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2 text-sm">
+              <div class="bg-white/10 rounded-lg px-3 py-1 backdrop-blur-sm">
+                📄 CI: {{ paciente?.ci }}
+              </div>
+              <div class="bg-white/10 rounded-lg px-3 py-1 backdrop-blur-sm">
+                ⚥ {{ paciente?.genero === 'masculino' ? 'Masculino' : 'Femenino' }}
+              </div>
+              <div class="bg-white/10 rounded-lg px-3 py-1 backdrop-blur-sm">
+                🎂 {{ calcularEdad(paciente?.fecha_nacimiento || '') }} años
+              </div>
+              <div class="bg-white/10 rounded-lg px-3 py-1 backdrop-blur-sm">
+                ⚖️ Peso: {{ ultimaMedida?.peso_kg || 'N/A' }} kg
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjetas de energía con efecto hover 3D -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Energía Total -->
+        <div class="group relative overflow-hidden bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-5 text-white shadow-lg transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:-translate-y-1">
+          <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+          <div class="relative z-10 text-center">
+            <div class="text-4xl mb-2 animate-bounce-slow">🔥</div>
+            <p class="text-sm font-semibold uppercase tracking-wider opacity-90">Energía Total</p>
+            <p class="text-4xl font-bold mt-2">{{ kcalTotales || 0 }}</p>
+            <p class="text-xs mt-1 opacity-75">Kilocalorías Totales</p>
+            <div class="mt-3 pt-3 border-t border-white/20">
+              <p class="text-xs">Kcal/kg: <span class="font-bold">{{ ((kcalTotales || 0) / (ultimaMedida?.peso_kg || 1)).toFixed(1) }}</span></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Proteínas -->
+        <div class="group relative overflow-hidden bg-gradient-to-r from-purple-500 to-purple-700 rounded-2xl p-5 text-white shadow-lg transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:-translate-y-1">
+          <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+          <div class="relative z-10 text-center">
+            <div class="text-4xl mb-2 animate-float">🥚</div>
+            <p class="text-sm font-semibold uppercase tracking-wider opacity-90">Proteínas</p>
+            <input type="number" [(ngModel)]="proteinas_g_kg" (input)="calcular()" step="0.1" min="0.5" max="3"
+              class="w-full text-center text-3xl font-bold bg-white/20 rounded-xl p-2 mt-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50">
+            <p class="text-xs mt-1">g/kg</p>
+            <div class="mt-3 pt-3 border-t border-white/20">
+              <p class="text-sm">Total: <strong class="text-xl">{{ proteinasGramos.toFixed(0) }} g</strong></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grasas -->
+        <div class="group relative overflow-hidden bg-gradient-to-r from-yellow-500 to-orange-600 rounded-2xl p-5 text-white shadow-lg transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:-translate-y-1">
+          <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+          <div class="relative z-10 text-center">
+            <div class="text-4xl mb-2 animate-float animation-delay-500">🛢️</div>
+            <p class="text-sm font-semibold uppercase tracking-wider opacity-90">Grasas</p>
+            <input type="number" [(ngModel)]="porcentaje_grasas" (input)="calcular()" step="1" min="15" max="40"
+              class="w-full text-center text-3xl font-bold bg-white/20 rounded-xl p-2 mt-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50">
+            <p class="text-xs mt-1">% del total</p>
+            <div class="mt-3 pt-3 border-t border-white/20">
+              <p class="text-sm">Total: <strong class="text-xl">{{ grasasGramos.toFixed(0) }} g</strong></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resultados con animación -->
+      <div class="bg-white rounded-2xl border-2 border-gray-100 shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl">
+        <div class="bg-gradient-to-r from-gray-800 to-gray-900 text-white p-4">
+          <h3 class="font-bold text-lg flex items-center gap-2">
+            <span class="text-2xl animate-spin-slow">📊</span>
+            Distribución de Macronutrientes
+          </h3>
+        </div>
+        <div class="p-6">
+          <!-- Barra de progreso animada -->
+          <div class="mb-8">
+            <div class="flex justify-between text-sm mb-2 font-semibold">
+              <span>Distribución de Nutrientes</span>
+              <span class="text-green-600 bg-green-100 px-3 py-1 rounded-full">100%</span>
+            </div>
+            <div class="flex h-10 rounded-xl overflow-hidden shadow-inner">
+              <div class="bg-gradient-to-r from-purple-500 to-purple-700 flex items-center justify-center text-white text-sm font-bold transition-all duration-500 ease-out hover:opacity-90"
+                   [style.width.%]="porcentajeProteinas">
+                <span class="hidden md:inline">PROTEÍNAS {{ porcentajeProteinas.toFixed(0) }}%</span>
+                <span class="md:hidden">{{ porcentajeProteinas.toFixed(0) }}%</span>
+              </div>
+              <div class="bg-gradient-to-r from-yellow-500 to-orange-600 flex items-center justify-center text-white text-sm font-bold transition-all duration-500 ease-out hover:opacity-90"
+                   [style.width.%]="porcentajeGrasasCalc">
+                <span class="hidden md:inline">GRASAS {{ porcentajeGrasasCalc.toFixed(0) }}%</span>
+                <span class="md:hidden">{{ porcentajeGrasasCalc.toFixed(0) }}%</span>
+              </div>
+              <div class="bg-gradient-to-r from-blue-500 to-cyan-600 flex items-center justify-center text-white text-sm font-bold transition-all duration-500 ease-out hover:opacity-90"
+                   [style.width.%]="porcentajeCarbohidratos">
+                <span class="hidden md:inline">CARBOHIDRATOS {{ porcentajeCarbohidratos.toFixed(0) }}%</span>
+                <span class="md:hidden">{{ porcentajeCarbohidratos.toFixed(0) }}%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tarjetas de nutrientes -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="group relative bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-5 text-center border-2 border-purple-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+              <div class="text-5xl mb-3 animate-float">🥚</div>
+              <h4 class="font-bold text-purple-800 text-lg">PROTEÍNAS</h4>
+              <div class="text-4xl font-bold text-purple-700 my-3">{{ porcentajeProteinas.toFixed(0) }}%</div>
+              <div class="grid grid-cols-2 gap-3 pt-3 border-t border-purple-200">
+                <div><div class="text-xs text-gray-500">Kcal</div><div class="font-bold text-purple-700 text-lg">{{ kcalProteinas.toFixed(0) }}</div></div>
+                <div><div class="text-xs text-gray-500">Gramos</div><div class="font-bold text-purple-700 text-lg">{{ proteinasGramos.toFixed(0) }}</div></div>
+              </div>
+            </div>
+            <div class="group relative bg-gradient-to-br from-yellow-50 to-orange-100 rounded-2xl p-5 text-center border-2 border-yellow-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+              <div class="text-5xl mb-3 animate-float animation-delay-200">🛢️</div>
+              <h4 class="font-bold text-orange-800 text-lg">GRASAS</h4>
+              <div class="text-4xl font-bold text-orange-700 my-3">{{ porcentajeGrasasCalc.toFixed(0) }}%</div>
+              <div class="grid grid-cols-2 gap-3 pt-3 border-t border-yellow-200">
+                <div><div class="text-xs text-gray-500">Kcal</div><div class="font-bold text-orange-700 text-lg">{{ kcalGrasas.toFixed(0) }}</div></div>
+                <div><div class="text-xs text-gray-500">Gramos</div><div class="font-bold text-orange-700 text-lg">{{ grasasGramos.toFixed(0) }}</div></div>
+              </div>
+            </div>
+            <div class="group relative bg-gradient-to-br from-blue-50 to-cyan-100 rounded-2xl p-5 text-center border-2 border-blue-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+              <div class="text-5xl mb-3 animate-float animation-delay-500">🍞</div>
+              <h4 class="font-bold text-blue-800 text-lg">CARBOHIDRATOS</h4>
+              <div class="text-4xl font-bold text-blue-700 my-3">{{ porcentajeCarbohidratos.toFixed(0) }}%</div>
+              <div class="grid grid-cols-2 gap-3 pt-3 border-t border-blue-200">
+                <div><div class="text-xs text-gray-500">Kcal</div><div class="font-bold text-blue-700 text-lg">{{ kcalCarbohidratos.toFixed(0) }}</div></div>
+                <div><div class="text-xs text-gray-500">Gramos</div><div class="font-bold text-blue-700 text-lg">{{ carbohidratosGramos.toFixed(0) }}</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabla -->
+          <div class="overflow-x-auto rounded-xl border border-gray-200">
+            <table class="w-full">
+              <thead>
+                <tr class="bg-gradient-to-r from-gray-800 to-gray-900 text-white">
+                  <th class="p-3 text-center">NUTRIENTE</th>
+                  <th class="p-3 text-center">PORCENTAJE</th>
+                  <th class="p-3 text-center">KILOCALORÍAS</th>
+                  <th class="p-3 text-center">GRAMOS</th>
+                  <th class="p-3 text-center">g/Kg</th>
+                  <th class="p-3 text-center">Kcal/g</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="bg-gradient-to-r from-purple-50/50 to-purple-100/50 border-b border-purple-100 hover:from-purple-100 hover:to-purple-200 transition-all duration-300">
+                  <td class="p-3 text-center font-bold text-purple-700">🥚 PROTEÍNAS</td>
+                  <td class="p-3 text-center"><span class="bg-purple-200 text-purple-800 px-3 py-1 rounded-full font-semibold">{{ porcentajeProteinas.toFixed(1) }}%</span></td>
+                  <td class="p-3 text-center font-bold text-purple-700">{{ kcalProteinas.toFixed(0) }}</td>
+                  <td class="p-3 text-center font-bold text-purple-700">{{ proteinasGramos.toFixed(1) }}</td>
+                  <td class="p-3 text-center">{{ (proteinasGramos / (ultimaMedida?.peso_kg || 1)).toFixed(2) }}</td>
+                  <td class="p-3 text-center"><span class="bg-purple-200 px-3 py-1 rounded-full font-bold">4</span></td>
+                </tr>
+                <tr class="bg-gradient-to-r from-yellow-50/50 to-orange-100/50 border-b border-yellow-100 hover:from-yellow-100 hover:to-orange-200 transition-all duration-300">
+                  <td class="p-3 text-center font-bold text-orange-700">🛢️ GRASAS</td>
+                  <td class="p-3 text-center"><span class="bg-yellow-200 text-orange-800 px-3 py-1 rounded-full font-semibold">{{ porcentajeGrasasCalc.toFixed(1) }}%</span></td>
+                  <td class="p-3 text-center font-bold text-orange-700">{{ kcalGrasas.toFixed(0) }}</td>
+                  <td class="p-3 text-center font-bold text-orange-700">{{ grasasGramos.toFixed(1) }}</td>
+                  <td class="p-3 text-center">{{ (grasasGramos / (ultimaMedida?.peso_kg || 1)).toFixed(2) }}</td>
+                  <td class="p-3 text-center"><span class="bg-yellow-200 px-3 py-1 rounded-full font-bold">9</span></td>
+                </tr>
+                <tr class="bg-gradient-to-r from-blue-50/50 to-cyan-100/50 hover:from-blue-100 hover:to-cyan-200 transition-all duration-300">
+                  <td class="p-3 text-center font-bold text-blue-700">🍞 CARBOHIDRATOS</td>
+                  <td class="p-3 text-center"><span class="bg-blue-200 text-blue-800 px-3 py-1 rounded-full font-semibold">{{ porcentajeCarbohidratos.toFixed(1) }}%</span></td>
+                  <td class="p-3 text-center font-bold text-blue-700">{{ kcalCarbohidratos.toFixed(0) }}</td>
+                  <td class="p-3 text-center font-bold text-blue-700">{{ carbohidratosGramos.toFixed(1) }}</td>
+                  <td class="p-3 text-center">{{ (carbohidratosGramos / (ultimaMedida?.peso_kg || 1)).toFixed(2) }}</td>
+                  <td class="p-3 text-center"><span class="bg-blue-200 px-3 py-1 rounded-full font-bold">4</span></td>
+                </tr>
+                <tr class="bg-gradient-to-r from-gray-100 to-gray-200 font-bold">
+                  <td class="p-3 text-center">TOTAL</td>
+                  <td class="p-3 text-center"><span class="bg-green-200 text-green-800 px-3 py-1 rounded-full">100%</span></td>
+                  <td class="p-3 text-center text-green-700">{{ kcalTotales.toFixed(0) }}</td>
+                  <td class="p-3 text-center text-green-700">{{ (proteinasGramos + grasasGramos + carbohidratosGramos).toFixed(1) }}</td>
+                  <td class="p-3 text-center">-</td>
+                  <td class="p-3 text-center">-</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex justify-end gap-4 mt-8 pt-6 border-t-2 border-gray-200">
+        <button (click)="cerrar()" 
+                class="px-8 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 hover:scale-105">
+          Cancelar
+        </button>
+        <button (click)="guardar()" [disabled]="calculando || !formularioValido()"
+                class="relative overflow-hidden px-8 py-3 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 bg-[length:200%_200%] animate-gradient text-white rounded-xl font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:hover:scale-100 group">
+          <span class="relative z-10 flex items-center gap-2">
+            <span class="text-xl">{{ calculando ? '⏳' : '💾' }}</span>
+            {{ calculando ? 'Calculando...' : 'Calcular y Guardar' }}
+          </span>
+          <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Toast interno dentro del modal -->
+    @if (mostrarToast) {
+      <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-50 animate-toast-slide">
+        <div class="px-6 py-3 rounded-xl shadow-2xl flex items-center gap-2 text-white font-semibold"
+          [class.bg-gradient-to-r]="true"
+          [class.from-green-500]="toastTipo === 'success'"
+          [class.to-emerald-600]="toastTipo === 'success'"
+          [class.from-red-500]="toastTipo === 'error'"
+          [class.to-rose-600]="toastTipo === 'error'">
+          <span>{{ toastTipo === 'success' ? '✅' : '❌' }}</span>
+          <span>{{ toastMensaje }}</span>
+        </div>
+      </div>
+    }
+  </div>
+</div>

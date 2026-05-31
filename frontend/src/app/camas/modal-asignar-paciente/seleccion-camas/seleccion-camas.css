@@ -1,0 +1,191 @@
+/* Indicadores visuales animados con CSS */
+.indicador-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  perspective: 500px;
+}
+
+.indicador-visual {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.figura {
+  width: 100%;
+  height: 100%;
+  animation: girar 4s linear infinite, pulsar 2s ease-in-out infinite;
+}
+
+/* Disponible - Esfera */
+.indicador-disponible .figura {
+  background: radial-gradient(circle at 30% 30%, #3b82f6, #1e40af);
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+}
+
+/* Ocupada - Cubo */
+.indicador-ocupada .figura {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  animation: girarCubo 4s linear infinite, pulsar 2s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+}
+
+/* Reservada - Toro (aro) */
+.indicador-reservada .figura {
+  background: radial-gradient(circle at 30% 30%, #06b6d4, #0891b2);
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+}
+
+.indicador-reservada .figura::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  background: #0891b2;
+  opacity: 0.7;
+}
+
+/* Mantenimiento - Cono */
+.indicador-mantenimiento .figura {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+}
+
+/* Animaciones */
+@keyframes girar {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+@keyframes girarCubo {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  100% {
+    transform: rotateX(360deg) rotateY(360deg);
+  }
+}
+
+@keyframes pulsar {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* Estilos de las tarjetas */
+.cama-card {
+  background: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cama-card.disponible {
+  border-left: 4px solid #3b82f6;
+  background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+}
+
+.cama-card.ocupada {
+  border-left: 4px solid #8b5cf6;
+  background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);
+}
+
+.cama-card.mantenimiento {
+  border-left: 4px solid #f59e0b;
+  background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+}
+
+.cama-card.reservada {
+  border-left: 4px solid #06b6d4;
+  background: linear-gradient(135deg, #ffffff 0%, #ecfeff 100%);
+}
+
+/* Badges de estado */
+.estado-badge {
+  display: inline-block;
+}
+
+.disponible-badge {
+  background: #3b82f6;
+  color: white;
+}
+
+.ocupada-badge {
+  background: #8b5cf6;
+  color: white;
+}
+
+.mantenimiento-badge {
+  background: #f59e0b;
+  color: white;
+}
+
+.reservada-badge {
+  background: #06b6d4;
+  color: white;
+}
+
+/* Botones */
+.disponible-btn {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+}
+
+.disponible-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

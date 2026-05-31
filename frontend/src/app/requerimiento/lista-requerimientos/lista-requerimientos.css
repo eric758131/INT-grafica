@@ -1,0 +1,41 @@
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* Scrollbar personalizada para el panel */
+.fixed.inset-y-0.right-0::-webkit-scrollbar {
+  width: 6px;
+}
+
+.fixed.inset-y-0.right-0::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.fixed.inset-y-0.right-0::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #3b82f6, #9333ea);
+  border-radius: 10px;
+}
+
+/* Asegurar que el canvas 3D no se desborde */
+#chart3dContainer canvas {
+  border-radius: 12px;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Ajustes responsive */
+@media (max-width: 768px) {
+  .fixed.inset-y-0.right-0 {
+    width: 100% !important;
+  }
+}
